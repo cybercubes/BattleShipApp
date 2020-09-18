@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MenuSystem
 {
+    public enum MenuLevel
+    {
+        Level0,
+        Level1,
+        Level2Plus
+    }
+    
     public class Menu
     {
-        public List<MenuItem> MenuItems { get; set; }
-
-        public Menu()
+        public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+        private readonly MenuLevel _menuLevel;
+        
+        public Menu(MenuLevel level)
         {
-            MenuItems = new List<MenuItem>();
-            MenuItems.Add(new MenuItem("new game player vs player", "1"));
-            MenuItems.Add(new MenuItem("New game person vs AI", "2"));
-            MenuItems.Add(new MenuItem("new game AI vs AI", "3"));
+            _menuLevel = level;
         }
 
         public void RunMenu()
@@ -25,40 +31,48 @@ namespace MenuSystem
                 {
                     Console.WriteLine(menuItem);
                 }
+
+                switch (_menuLevel)
+                {
+                    case MenuLevel.Level0:
+                        Console.WriteLine("X) exit");
+                        break;
+                    case MenuLevel.Level1:
+                        Console.WriteLine("M) return to Main");
+                        Console.WriteLine("X) exit");
+                        break;
+                    case MenuLevel.Level2Plus:
+                        Console.WriteLine("R) return to previous");
+                        Console.WriteLine("M) return to Main");
+                        Console.WriteLine("X) exit");
+                        break;
+                    default:
+                        throw new Exception("unknown menu depth");
+
+                }
                 
-                Console.WriteLine("L) Load game");
-                Console.WriteLine("X) exit");
                 Console.Write(">");
                 
                 userChoice = Console.ReadLine()?.ToLower().Trim() ?? "";
 
                 Console.WriteLine("Your Choice was:" + userChoice);
-                switch (userChoice)
+                if (userChoice == "x")
                 {
-                    case "1":
-                        Console.WriteLine("not implemented yet");
-                        break;
+                    Console.WriteLine("closing down.........");
+                    break;  
+                }
+
+                var userMenuItem = MenuItems.FirstOrDefault(t => t.UserChoice == userChoice);
+                if (userMenuItem != null)
+                {
+                    userMenuItem.MethodToExecute();
+                }
+                else
+                {
+                    Console.WriteLine("No such option!!");    
+                }
                 
-                    case "2":
-                        Console.WriteLine("not implemented yet");
-                        break;
-                
-                    case "3":
-                        Console.WriteLine("not implemented yet");
-                        break;
-                
-                    case "l":
-                        Console.WriteLine("not implemented yet");
-                        break;
-                    case "x":
-                        Console.WriteLine("closing down");
-                        break;
-                    default:
-                        Console.WriteLine("Invalid input, no option matches input");
-                        break;
-                }    
             } while (userChoice != "x");
-        
         }
     }
 }
