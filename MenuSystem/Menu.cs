@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MenuSystem.Enums;
 
 namespace MenuSystem
 {
-    public enum MenuLevel
-    {
-        Level0,
-        Level1,
-        Level2Plus
-    }
-    
+
     public class Menu
     {
         public List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
-        private readonly MenuLevel _menuLevel;
+        private readonly MenuLevels _menuLevel;
         
-        public Menu(MenuLevel level)
+        public Menu(MenuLevels level)
         {
             _menuLevel = level;
         }
@@ -34,21 +29,20 @@ namespace MenuSystem
 
                 switch (_menuLevel)
                 {
-                    case MenuLevel.Level0:
+                    case MenuLevels.Level0:
                         Console.WriteLine("X) exit");
                         break;
-                    case MenuLevel.Level1:
+                    case MenuLevels.Level1:
                         Console.WriteLine("M) return to Main");
                         Console.WriteLine("X) exit");
                         break;
-                    case MenuLevel.Level2Plus:
+                    case MenuLevels.Level2Plus:
                         Console.WriteLine("R) return to previous");
                         Console.WriteLine("M) return to Main");
                         Console.WriteLine("X) exit");
                         break;
                     default:
                         throw new Exception("unknown menu depth");
-
                 }
                 
                 Console.Write(">");
@@ -73,6 +67,10 @@ namespace MenuSystem
                 }
                 
             } while (userChoice != "x");
+        }
+        public static void DefaultMenuAction()
+        {
+            Console.WriteLine("Not implemented yet!");
         }
     }
 }
