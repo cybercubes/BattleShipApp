@@ -14,18 +14,22 @@ namespace ica0016_2020f
             var menuA = new Menu(MenuLevels.Level1);
             var menuB = new Menu(MenuLevels.Level2Plus);
 
-            menu.MenuItems.Add(new MenuItem("got to submenu", "s", menuA.RunMenu));
-            menu.MenuItems.Add(new MenuItem("New game player vs player", "1", Menu.DefaultMenuAction));
-            menu.MenuItems.Add(new MenuItem("New game person vs AI", "2", Menu.DefaultMenuAction));
-            menu.MenuItems.Add(new MenuItem("New game AI vs AI", "3", Menu.DefaultMenuAction));
+            menu.AddMenuItem(new MenuItem("got to submenu", "s", menuA.RunMenu));
+            menu.AddMenuItem(new MenuItem("New game player vs player", "1", DefaultMenuAction));
+            menu.AddMenuItem(new MenuItem("New game person vs AI", "2", DefaultMenuAction));
+            menu.AddMenuItem(new MenuItem("New game AI vs AI", "3", DefaultMenuAction));
             
-            menuA.MenuItems.Add(new MenuItem("Sub 2.", "1", menuB.RunMenu));
-            menuB.MenuItems.Add(new MenuItem("go to submenu 2 .", "1", Menu.DefaultMenuAction));
+            menuA.AddMenuItem(new MenuItem("Sub 2.", "1", menuB.RunMenu));
+            menuB.AddMenuItem(new MenuItem("go to submenu 2 .", "1", DefaultMenuAction));
 
             menu.RunMenu();
             
         }
         
-        
+        public static string DefaultMenuAction()
+        {
+            Console.WriteLine("Not implemented yet!");
+            return "";
+        }
     }
 }

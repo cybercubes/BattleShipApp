@@ -6,12 +6,12 @@ namespace MenuSystem
     {
         public virtual string Label { get; set; }
         public virtual string UserChoice { get; set; }
-        public virtual Action MethodToExecute { get; set; }
+        public virtual Func<string> MethodToExecute { get; set; }
 
-        public MenuItem(string label, string userChoice, Action methodToExecute)
+        public MenuItem(string label, string userChoice, Func<string> methodToExecute)
         {
-            Label = label;
-            UserChoice = userChoice;
+            Label = label.Trim();
+            UserChoice = userChoice.Trim();
             MethodToExecute = methodToExecute;
         }
 
