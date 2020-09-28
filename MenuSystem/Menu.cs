@@ -15,7 +15,7 @@ namespace MenuSystem
         
         private readonly MenuLevels _menuLevel;
 
-        private readonly string[] reservedActions = new[] {"x", "m", "r"};
+        private readonly string[] _reservedActions = {"x", "m", "r"};
         
         public Menu(MenuLevels level)
         {
@@ -66,10 +66,9 @@ namespace MenuSystem
 
                 userChoice = Console.ReadLine()?.ToLower().Trim() ?? "";
                 Console.WriteLine("Your Choice was:" + userChoice);
-                var userChoiceFromAction = "";
 
                 //is it a reserved keyword
-                if (!reservedActions.Contains(userChoice))
+                if (!_reservedActions.Contains(userChoice))
                 {
                     //no it wasn't, try to find a keyword in MenuItems
                     if (MenuItems.TryGetValue(userChoice, out var userMenuItem))
@@ -96,6 +95,7 @@ namespace MenuSystem
                 
                 if (userChoice == "r" && _menuLevel == MenuLevels.Level2Plus)
                 {
+                    userChoice = null;
                     break;
                 }
 
