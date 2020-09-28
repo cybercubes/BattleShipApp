@@ -17,7 +17,7 @@ namespace MenuSystem
 
         public override string ToString()
         {
-            return UserChoice + ") " + Label;
+            return UserChoice.ToUpper() + ") " + Label;
         }
     }
 }

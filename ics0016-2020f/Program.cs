@@ -19,21 +19,18 @@ namespace ica0016_2020f
             menu.AddMenuItem(new MenuItem("New game player vs player", "1", DefaultMenuAction));
             menu.AddMenuItem(new MenuItem("New game person vs AI", "2", DefaultMenuAction));
             menu.AddMenuItem(new MenuItem("New game AI vs AI", "3", DefaultMenuAction));
-            menu.AddMenuItem(new MenuItem("test submenus", "s", menuA.RunMenu));
-
+            menu.AddMenuItem(new MenuItem("dead end option", "s", menuC.RunMenu));
 
             menuA.AddMenuItem(new MenuItem("Sub 2.", "1", menuB.RunMenu));
             
             menuB.AddMenuItem(new MenuItem("sub 3.", "1", menuC.RunMenu));
-            menuB.AddMenuItem(new MenuItem("sub 3.", "2", DefaultMenuAction));
-            
-            menuC.AddMenuItem(new MenuItem("end of the line?", "1", DefaultMenuAction));
+            menuB.AddMenuItem(new MenuItem("dud option.", "2", DefaultMenuAction));
 
             menu.RunMenu();
             
         }
-        
-        public static string DefaultMenuAction()
+
+        private static string DefaultMenuAction()
         {
             Console.WriteLine("Not implemented yet!");
             return "";

@@ -8,9 +8,6 @@ namespace MenuSystem
 
     public class Menu
     {
-        //list is not  really optimal choice
-        //private List<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
-
         private Dictionary<string, MenuItem> MenuItems { get; set; } = new Dictionary<string, MenuItem>();
         
         private readonly MenuLevels _menuLevel;
@@ -29,21 +26,26 @@ namespace MenuSystem
                 throw new ArgumentException("UserChoice is an empty string");
             }
 
-            if (_reservedActions.Contains(item.UserChoice.Trim().ToLower()))
+            if (_reservedActions.Contains(item.UserChoice.ToLower()))
             {
                 throw new ArgumentException("UserChoice is reserved");
             }
-
-            MenuItems.Add(item.UserChoice, item);
+            
+            MenuItems.Add(item.UserChoice.ToLower(), item);
         }
-
-        //something other than void should be there
-        public string RunMenu() //needs to be of type Func String
+        public string RunMenu()
         {
+            if (MenuItems.Count == 0)
+            {
+                Console.WriteLine("that menu has no options available");
+                return null;
+            }
+            
             var userChoice = "";
             do
             {
                 Console.Write("");
+                
                 foreach (var menuItem in MenuItems)
                 {
                     Console.WriteLine(menuItem.Value);
