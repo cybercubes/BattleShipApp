@@ -28,7 +28,12 @@ namespace MenuSystem
             {
                 throw new ArgumentException("UserChoice is an empty string");
             }
-            
+
+            if (_reservedActions.Contains(item.UserChoice.Trim().ToLower()))
+            {
+                throw new ArgumentException("UserChoice is reserved");
+            }
+
             MenuItems.Add(item.UserChoice, item);
         }
 

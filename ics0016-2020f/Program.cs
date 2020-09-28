@@ -25,6 +25,7 @@ namespace ica0016_2020f
             menuA.AddMenuItem(new MenuItem("Sub 2.", "1", menuB.RunMenu));
             
             menuB.AddMenuItem(new MenuItem("sub 3.", "1", menuC.RunMenu));
+            menuB.AddMenuItem(new MenuItem("sub 3.", "2", DefaultMenuAction));
             
             menuC.AddMenuItem(new MenuItem("end of the line?", "1", DefaultMenuAction));
 
