@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ics0016-2020f", "ics0016-2020f\ics0016-2020f.csproj", "{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{37879FE1-1C07-4D66-95AE-2D19C20CBF91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBrain", "GameBrain\GameBrain.csproj", "{290FBE5E-1B1F-4D07-936D-09C73ACC3F25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameConsoleUI", "GameConsoleUI\GameConsoleUI.csproj", "{2B49A6F8-A377-4BC9-A47D-622C776C954E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37879FE1-1C07-4D66-95AE-2D19C20CBF91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37879FE1-1C07-4D66-95AE-2D19C20CBF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37879FE1-1C07-4D66-95AE-2D19C20CBF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37879FE1-1C07-4D66-95AE-2D19C20CBF91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{290FBE5E-1B1F-4D07-936D-09C73ACC3F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{290FBE5E-1B1F-4D07-936D-09C73ACC3F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{290FBE5E-1B1F-4D07-936D-09C73ACC3F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{290FBE5E-1B1F-4D07-936D-09C73ACC3F25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B49A6F8-A377-4BC9-A47D-622C776C954E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B49A6F8-A377-4BC9-A47D-622C776C954E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B49A6F8-A377-4BC9-A47D-622C776C954E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B49A6F8-A377-4BC9-A47D-622C776C954E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
