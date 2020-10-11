@@ -6,29 +6,37 @@ namespace GameBrain
 {
     public class BattleShip
     {
-        private CellState[,] _board;
-        private int _boardSize;
-        private bool _nextMoveByX = true;
+        private CellState[,] _boardA;
+        private CellState[,] _boardB;
+        private readonly int _boardSize;
+        private bool _nextMoveByA = true;
         
         public BattleShip(int size)
         {
-            _board = new CellState[size,size];
+            _boardA = new CellState[size, size];
+            _boardB = new CellState[size, size];
             _boardSize = size;
         }
 
-        public CellState[,] GetBoard()
+        public (CellState[,], CellState[,]) GetBoards()
         {
-            var res = new CellState[_boardSize,_boardSize];
-            Array.Copy(_board, res, _board.Length );
-            return res;
+            var resA = new CellState[_boardSize,_boardSize];
+            Array.Copy(_boardA, resA, _boardA.Length );
+            
+            var resB = new CellState[_boardSize,_boardSize];
+            Array.Copy(_boardA, resB, _boardA.Length );
+
+            return (resA, resB);
         }
 
         public bool MakeAMove(int x, int y)
         {
-            if (_board[x, y] == CellState.Empty)
+            CellState[,] board = _nextMoveByA ? _boardA : _boardB;
+            
+            if (board[x, y] == CellState.Empty)
             {
-                _board[x, y] = _nextMoveByX ? CellState.X : CellState.O;
-                _nextMoveByX = !_nextMoveByX;
+                board[x, y] = CellState.X;
+                _nextMoveByA = !_nextMoveByA;
                 return true;
             }
 
@@ -40,25 +48,30 @@ namespace GameBrain
         {
             var state = new GameState
             {
-                NextMoveByX = _nextMoveByX, 
-                Width = _board.GetLength(0), 
-                Height = _board.GetLength(1)
+                NextMoveByX = _nextMoveByA, 
+                Width = _boardA.GetLength(0), 
+                Height = _boardA.GetLength(1)
             };
             
-            state.Board = new CellState[state.Width ][];
+            state.BoardA = new CellState[state.Width ][];
+            state.BoardB = new CellState[state.Width ][];
             
-            for (var i = 0; i < state.Board.Length; i++)
+            for (var i = 0; i < state.BoardA.Length; i++)
             {
-                state.Board[i] = new CellState[state.Height];
+                state.BoardA[i] = new CellState[state.Height];
+                state.BoardB[i] = new CellState[state.Height];
             }
 
             for (var x = 0; x < state.Width; x++)
             {
                 for (var y = 0; y < state.Height; y++)
                 {
-                    state.Board[x][y] = _board[x, y];
+                    state.BoardA[x][y] = _boardA[x, y];
+                    state.BoardB[x][y] = _boardB[x, y];
                 }
             }
+            
+            ////// board B
 
             var jsonOptions = new JsonSerializerOptions()
             {
@@ -73,14 +86,16 @@ namespace GameBrain
             var state = JsonSerializer.Deserialize<GameState>(jsonString);
             
             // restore actual state from deserialized state
-            _nextMoveByX = state.NextMoveByX;
-            _board =  new CellState[state.Width, state.Height];
+            _nextMoveByA = state.NextMoveByX;
+            _boardA =  new CellState[state.Width, state.Height];
+            _boardB =  new CellState[state.Width, state.Height];
             
             for (var x = 0; x < state.Width; x++)
             {
                 for (var y = 0; y < state.Height; y++)
                 {
-                    _board[x, y] = state.Board[x][y];
+                    _boardA[x, y] = state.BoardA[x][y];
+                    _boardB[x, y] = state.BoardB[x][y];
                 }
             }
             
@@ -89,6 +104,11 @@ namespace GameBrain
         public int GetBoardSize()
         {
             return _boardSize;
+        }
+        
+        public bool GetTurn()
+        {
+            return _nextMoveByA;
         }
     }
 

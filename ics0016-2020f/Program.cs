@@ -24,7 +24,7 @@ namespace ica0016_2020f
         {
             var game = new BattleShip(5);
             
-            BattleShipConsoleUi.DrawBoard(game.GetBoard());
+            BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
             var menu = new Menu(MenuLevels.Level1);
             menu.AddMenuItem(new MenuItem(
@@ -34,7 +34,7 @@ namespace ica0016_2020f
                 {
                     var (x, y) = GetMoveCoordinates(game);
                     game.MakeAMove(x, y);
-                    BattleShipConsoleUi.DrawBoard(game.GetBoard());
+                    BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
                     return "";
                 })
             );
@@ -118,7 +118,7 @@ namespace ica0016_2020f
 
             game.SetGameStateFromJsonString(jsonString);
             
-            BattleShipConsoleUi.DrawBoard(game.GetBoard());
+            BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
             return "";
         }
