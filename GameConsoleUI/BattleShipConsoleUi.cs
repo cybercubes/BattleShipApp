@@ -9,7 +9,7 @@ namespace GameConsoleUi
         public static void DrawBothBoards((CellState[,], CellState[,]) boards, bool isAsTurn)
         {
             DrawBoard(isAsTurn ? boards.Item1 : boards.Item2, isAsTurn);
-            Console.WriteLine("===================================");
+            Console.WriteLine("YOU\\/=====================/\\THEM");
             DrawBoard(isAsTurn ? boards.Item2 : boards.Item1, isAsTurn);
         }
         
@@ -50,7 +50,7 @@ namespace GameConsoleUi
                 case CellState.O:
                     return "O";
                 case CellState.X:
-                    return isAsTurn ? "X" : " ";
+                    return "X";
             }
 
             return "-";

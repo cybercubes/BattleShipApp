@@ -24,7 +24,7 @@ namespace GameBrain
             Array.Copy(_boardA, resA, _boardA.Length );
             
             var resB = new CellState[_boardSize,_boardSize];
-            Array.Copy(_boardA, resB, _boardA.Length );
+            Array.Copy(_boardB, resB, _boardA.Length );
 
             return (resA, resB);
         }
