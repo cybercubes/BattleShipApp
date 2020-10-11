@@ -6,17 +6,22 @@ namespace GameBrain
 {
     public class BattleShip
     {
-        private CellState[,] _board = new CellState[3,3];
+        private CellState[,] _board;
+        private int _boardSize;
         private bool _nextMoveByX = true;
         
+        public BattleShip(int size)
+        {
+            _board = new CellState[size,size];
+            _boardSize = size;
+        }
+
         public CellState[,] GetBoard()
         {
-            var res = new CellState[3,3];
+            var res = new CellState[_boardSize,_boardSize];
             Array.Copy(_board, res, _board.Length );
             return res;
         }
-
-        public bool NextMoveByX => _nextMoveByX;
 
         public bool MakeAMove(int x, int y)
         {
@@ -79,6 +84,11 @@ namespace GameBrain
                 }
             }
             
+        }
+
+        public int GetBoardSize()
+        {
+            return _boardSize;
         }
     }
 

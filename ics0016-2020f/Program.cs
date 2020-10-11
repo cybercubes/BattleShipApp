@@ -14,7 +14,7 @@ namespace ica0016_2020f
             Console.WriteLine("============> BattleShip KILOSS <=================");
 
             var menu = new Menu(MenuLevels.Level0);
-            menu.AddMenuItem(new MenuItem("New game human vs human. Pointless.", "1", BattleShip));
+            menu.AddMenuItem(new MenuItem("New PvP game", "1", BattleShip));
 
             menu.RunMenu();
 
@@ -22,17 +22,17 @@ namespace ica0016_2020f
 
         private static string BattleShip()
         {
-            var game = new BattleShip();
+            var game = new BattleShip(5);
             
             BattleShipConsoleUi.DrawBoard(game.GetBoard());
             
-            var menu = new Menu(MenuLevels.Level0);
+            var menu = new Menu(MenuLevels.Level1);
             menu.AddMenuItem(new MenuItem(
-                $"Player {(game.NextMoveByX ? "X" : "O")} make a move",
+                $"Make a move",
                 userChoice: "p",
                 () =>
                 {
-                    var (x, y) = GetMoveCordinates(game);
+                    var (x, y) = GetMoveCoordinates(game);
                     game.MakeAMove(x, y);
                     BattleShipConsoleUi.DrawBoard(game.GetBoard());
                     return "";
@@ -51,11 +51,6 @@ namespace ica0016_2020f
                 userChoice: "l",
                 () => { return LoadGameAction(game); })
             );
-            menu.AddMenuItem(new MenuItem(
-                $"Exit game",
-                userChoice: "e",
-                DefaultMenuAction)
-            );
 
             var userChoice = menu.RunMenu();
 
@@ -64,14 +59,46 @@ namespace ica0016_2020f
 
         }
         
-        static (int x, int y) GetMoveCordinates(BattleShip game)
+        static (int x, int y) GetMoveCoordinates(BattleShip game)
         {
-            Console.WriteLine("Upper left corner is (1,1)!");
-            Console.Write("Give X (1-3), Y (1-3):");
-            var userValue = Console.ReadLine()?.Split(',');
+            int x, y;
+            do
+            {
+                Console.WriteLine("Upper left corner is (1,1)!");
+                Console.Write($"Give X (1-{game.GetBoardSize()}), Y (1-{game.GetBoardSize()}):");
+                var userInput = Console.ReadLine();
+                if (userInput == null || userInput.Length < 3)
+                {
+                    Console.WriteLine("Invalid input! try again...1");
+                    continue;
+                }
+                var userValue = userInput?.Split(',');
+                if (userValue?.Length != 2)
+                {
+                    Console.WriteLine("Invalid input! try again...2");
+                    continue;
+                }
+                if (!int.TryParse(userValue?[0].Trim(), out x))
+                {
+                    Console.WriteLine("Invalid input! try again...3");
+                    continue;
+                }
+                if (!int.TryParse(userValue?[1].Trim(), out y))
+                {
+                    Console.WriteLine("Invalid input! try again...4");
+                    continue;
+                }
+                if (x > game.GetBoardSize() || y > game.GetBoardSize() || x < 0 || y < 0)
+                {
+                    Console.WriteLine("Chosen tile is out of bounds! try again...");
+                    continue;
+                }
 
-            var x = int.Parse(userValue[0].Trim()) - 1;
-            var y = int.Parse(userValue[1].Trim()) - 1;
+                break;
+            } while (true);
+
+            x -= 1;
+            y -= 1;
 
             return (x, y);
         }
@@ -107,7 +134,6 @@ namespace ica0016_2020f
                 fileName = defaultName;
             }
 
-            
             var serializedGame = game.GetSerializedGameState();
             
             // Console.WriteLine(serializedGame);
