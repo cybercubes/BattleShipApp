@@ -38,7 +38,7 @@ namespace MenuSystem
             if (MenuItems.Count == 0)
             {
                 Console.WriteLine("that menu has no options available");
-                return null;
+                return "";
             }
             
             var userChoice = "";
@@ -108,7 +108,7 @@ namespace MenuSystem
 
             } while (true);
 
-            return userChoice;
+            return userChoice!;
         }
     }
 }
