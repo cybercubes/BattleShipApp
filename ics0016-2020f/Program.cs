@@ -22,6 +22,13 @@ namespace ica0016_2020f
 
         private static string BattleShip()
         {
+            // initiate a function that will define board dimensions
+            
+            // intiate a function that will define ship amounts
+            
+            // initiate some function to fill out 2 boards with ships
+            
+            
             var game = new BattleShip(5);
             
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
