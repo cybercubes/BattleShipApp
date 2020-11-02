@@ -16,8 +16,8 @@ namespace GameConsoleUi
         public static void DrawBoard(CellState[,] board, bool isAsTurn)
         {
             // add plus 1, since this is 0 based. length 0 is returned as -1;
-            var width = board.GetUpperBound(0) + 1; // x
-            var height = board.GetUpperBound(1) + 1; // y
+            var width = board.GetUpperBound(1) + 1; // x
+            var height = board.GetUpperBound(0) + 1; // y
 
             for (int colIndex = 0; colIndex < width; colIndex++)
             {
@@ -29,7 +29,7 @@ namespace GameConsoleUi
             {
                 for (int colIndex = 0; colIndex < width; colIndex++)
                 {
-                    Console.Write($"| {CellString(board[colIndex, rowIndex], isAsTurn)} |");
+                    Console.Write($"| {CellString(board[rowIndex, colIndex], isAsTurn)} |");
                 }
                 Console.WriteLine();
                 for (int colIndex = 0; colIndex < width; colIndex++)
@@ -47,10 +47,12 @@ namespace GameConsoleUi
             {
                 case CellState.Empty:
                     return " ";
-                case CellState.O:
-                    return "O";
-                case CellState.X:
+                case CellState.Ship:
+                    return "[O]";
+                case CellState.Miss:
                     return "X";
+                case CellState.HitShip:
+                    return "[X]";
             }
 
             return "-";

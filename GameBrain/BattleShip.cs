@@ -8,22 +8,25 @@ namespace GameBrain
     {
         private CellState[,] _boardA;
         private CellState[,] _boardB;
-        private readonly int _boardSize;
+        private int _boardWidth;
+        private int _boardHeight;
         private bool _nextMoveByA = true;
-        
-        public BattleShip(int size)
+
+        public BattleShip(int width, int height)
         {
-            _boardA = new CellState[size, size];
-            _boardB = new CellState[size, size];
-            _boardSize = size;
+            _boardA = new CellState[height, width];
+            _boardB = new CellState[height, width];
+
+            _boardWidth = width;
+            _boardHeight = height;
         }
 
         public (CellState[,], CellState[,]) GetBoards()
         {
-            var resA = new CellState[_boardSize,_boardSize];
+            var resA = new CellState[_boardHeight,_boardWidth];
             Array.Copy(_boardA, resA, _boardA.Length );
             
-            var resB = new CellState[_boardSize,_boardSize];
+            var resB = new CellState[_boardHeight,_boardWidth];
             Array.Copy(_boardB, resB, _boardA.Length );
 
             return (resA, resB);
@@ -35,7 +38,7 @@ namespace GameBrain
             
             if (board[x, y] == CellState.Empty)
             {
-                board[x, y] = CellState.X;
+                board[x, y] = CellState.Miss;
                 _nextMoveByA = !_nextMoveByA;
                 return true;
             }
@@ -49,8 +52,8 @@ namespace GameBrain
             var state = new GameState
             {
                 NextMoveByX = _nextMoveByA, 
-                Width = _boardA.GetLength(0), 
-                Height = _boardA.GetLength(1)
+                Width = _boardA.GetLength(1), 
+                Height = _boardA.GetLength(0)
             };
             
             state.BoardA = new CellState[state.Width ][];
@@ -70,8 +73,6 @@ namespace GameBrain
                     state.BoardB[x][y] = _boardB[x, y];
                 }
             }
-            
-            ////// board B
 
             var jsonOptions = new JsonSerializerOptions()
             {
@@ -89,6 +90,9 @@ namespace GameBrain
             _nextMoveByA = state.NextMoveByX;
             _boardA =  new CellState[state.Width, state.Height];
             _boardB =  new CellState[state.Width, state.Height];
+            _boardHeight = state.Height;
+            _boardWidth = state.Width;
+            
             
             for (var x = 0; x < state.Width; x++)
             {
@@ -101,11 +105,16 @@ namespace GameBrain
             
         }
 
-        public int GetBoardSize()
+        public int GetBoardWidth()
         {
-            return _boardSize;
+            return _boardWidth;
         }
-        
+
+        public int GetBoardHeight()
+        {
+            return _boardHeight;
+        }
+
         public bool GetTurn()
         {
             return _nextMoveByA;

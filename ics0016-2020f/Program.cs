@@ -29,7 +29,7 @@ namespace ica0016_2020f
             // initiate some function to fill out 2 boards with ships
             
             
-            var game = new BattleShip(5);
+            var game = new BattleShip(10, 4);
             
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
@@ -72,7 +72,7 @@ namespace ica0016_2020f
             do
             {
                 Console.WriteLine("Upper left corner is (1,1)!");
-                Console.Write($"Give X (1-{game.GetBoardSize()}), Y (1-{game.GetBoardSize()}):");
+                Console.Write($"Give X (1-{game.GetBoardWidth()}), Y (1-{game.GetBoardHeight()}):");
                 var userInput = Console.ReadLine();
                 if (userInput == null || userInput.Length < 3)
                 {
@@ -95,7 +95,7 @@ namespace ica0016_2020f
                     Console.WriteLine("Invalid input! try again...4");
                     continue;
                 }
-                if (x > game.GetBoardSize() || y > game.GetBoardSize() || x < 0 || y < 0)
+                if (x > game.GetBoardWidth() || y > game.GetBoardHeight() || x < 0 || y < 0)
                 {
                     Console.WriteLine("Chosen tile is out of bounds! try again...");
                     continue;
