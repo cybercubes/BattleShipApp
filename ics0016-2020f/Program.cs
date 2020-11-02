@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DAL;
 using GameBrain;
 using GameBrain.Enums;
+using GameBrain.obj;
 using GameConsoleUi;
 using MenuSystem;
 using MenuSystem.Enums;
@@ -13,6 +15,8 @@ namespace ica0016_2020f
     {
         static void Main(string[] args)
         {
+            //using var db = new AppDbContext();
+            
             Console.WriteLine("============> BattleShip KILOSS <=================");
 
             var menu = new Menu(MenuLevels.Level0);
@@ -22,7 +26,23 @@ namespace ica0016_2020f
 
         }
 
-        private static void GameOptionSetup(GameOptions options)
+        private static string SaveEntryIntoDb(BattleShip game, AppDbContext db)
+        {
+
+            db.GameOptions.Add(game.GetGameOptions());
+
+            var gameSaveData = new GameSaveData()
+            {
+                SerializedGameData = game.GetSerializedGameState(),
+            };
+
+            db.GameSaveDatas.Add(gameSaveData);
+            db.SaveChanges();
+
+            return "";
+        }
+
+        private static void GameOptionSetup(GameOption option)
         {
             int x, y;
             string userInput;
@@ -57,8 +77,8 @@ namespace ica0016_2020f
                 break;
             } while (true);
 
-            options.BoardHeight = y;
-            options.BoardWidth = x;
+            option.BoardHeight = y;
+            option.BoardWidth = x;
 
             int userChoice;
             var canBoatsTouch= PrintEnum<CanBoatsTouch>();
@@ -88,7 +108,7 @@ namespace ica0016_2020f
                 break;
             } while (true);
 
-            options.CanBoatsTouch = canBoatsTouch[userChoice];
+            option.CanBoatsTouch = canBoatsTouch[userChoice];
             
             
             var moveOnHit= PrintEnum<MoveOnHit>();
@@ -118,21 +138,20 @@ namespace ica0016_2020f
                 break;
             } while (true);
 
-            options.MoveOnHit = moveOnHit[userChoice];
+            option.MoveOnHit = moveOnHit[userChoice];
 
         }
 
         private static string BattleShip()
         {
-            var gameOptions = new GameOptions();
+            var gameOptions = new GameOption();
 
             GameOptionSetup(gameOptions);
 
             // intiate a function that will define ship amounts
             
             // initiate some function to fill out 2 boards with ships
-            
-            
+
             var game = new BattleShip(gameOptions);
             
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
@@ -153,14 +172,14 @@ namespace ica0016_2020f
             menu.AddMenuItem(new MenuItem(
                 $"Save game",
                 userChoice: "s",
-                () => { return SaveGameAction(game); })
+                () => SaveGameAction(game))
             );
 
 
             menu.AddMenuItem(new MenuItem(
                 $"Load game",
                 userChoice: "l",
-                () => { return LoadGameAction(game); })
+                () => LoadGameAction(game))
             );
 
             var userChoice = menu.RunMenu();
@@ -169,7 +188,7 @@ namespace ica0016_2020f
             return userChoice;
 
         }
-        
+
         static (int x, int y) GetMoveCoordinates(BattleShip game)
         {
             int x, y;

@@ -12,17 +12,17 @@ namespace GameBrain
         private int _boardWidth;
         private int _boardHeight;
         private bool _nextMoveByA = true;
-        private GameOptions _gameOptions;
+        private GameOption _gameOption;
 
-        public BattleShip(GameOptions options)
+        public BattleShip(GameOption option)
         {
-            _boardA = new CellState[options.BoardHeight, options.BoardWidth];
-            _boardB = new CellState[options.BoardHeight, options.BoardWidth];
+            _boardA = new CellState[option.BoardHeight, option.BoardWidth];
+            _boardB = new CellState[option.BoardHeight, option.BoardWidth];
 
-            _boardWidth = options.BoardWidth;
-            _boardHeight = options.BoardHeight;
+            _boardWidth = option.BoardWidth;
+            _boardHeight = option.BoardHeight;
 
-            _gameOptions = options;
+            _gameOption = option;
 
         }
 
@@ -51,7 +51,7 @@ namespace GameBrain
             if (board[y, x] == CellState.Ship)
             {
                 board[y, x] = CellState.HitShip;
-                switch (_gameOptions.MoveOnHit)
+                switch (_gameOption.MoveOnHit)
                 {
                     case MoveOnHit.OtherPlayer:
                         _nextMoveByA = !_nextMoveByA;
@@ -72,7 +72,7 @@ namespace GameBrain
                 NextMoveByX = _nextMoveByA, 
                 Width = _boardA.GetLength(1), 
                 Height = _boardA.GetLength(0),
-                GameOptions = _gameOptions
+                GameOption = _gameOption
             };
             
             state.BoardA = new CellState[state.Width ][];
@@ -111,7 +111,7 @@ namespace GameBrain
             _boardB =  new CellState[state.Width, state.Height];
             _boardHeight = state.Height;
             _boardWidth = state.Width;
-            _gameOptions = state.GameOptions;
+            _gameOption = state.GameOption;
             
             
             for (var x = 0; x < state.Width; x++)
@@ -138,6 +138,11 @@ namespace GameBrain
         public bool GetTurn()
         {
             return _nextMoveByA;
+        }
+
+        public GameOption GetGameOptions()
+        {
+            return _gameOption;
         }
     }
 
