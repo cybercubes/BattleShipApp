@@ -4,6 +4,7 @@ namespace GameBrain
 {
     public class GameOptions
     {
+        public int GameOptionsId { get; set; }
         public int BoardWidth { get; set; } = 5;
 
         public int BoardHeight { get; set; } = 5;
