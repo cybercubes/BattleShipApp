@@ -36,9 +36,9 @@ namespace GameBrain
         {
             CellState[,] board = _nextMoveByA ? _boardA : _boardB;
             
-            if (board[x, y] == CellState.Empty)
+            if (board[y, x] == CellState.Empty)
             {
-                board[x, y] = CellState.Miss;
+                board[y, x] = CellState.Miss;
                 _nextMoveByA = !_nextMoveByA;
                 return true;
             }
