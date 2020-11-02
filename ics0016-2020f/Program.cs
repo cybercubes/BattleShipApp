@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GameBrain;
+using GameBrain.Enums;
 using GameConsoleUi;
 using MenuSystem;
 using MenuSystem.Enums;
@@ -20,16 +22,118 @@ namespace ica0016_2020f
 
         }
 
+        private static void GameOptionSetup(GameOptions options)
+        {
+            int x, y;
+            string userInput;
+            do
+            {
+                
+                Console.WriteLine("Enter board Size (X,Y): ");
+                Console.Write(">");
+                userInput = Console.ReadLine();
+                if (userInput == null || userInput.Length < 3)
+                {
+                    Console.WriteLine("Invalid input! try again...1");
+                    continue;
+                }
+                var userValue = userInput?.Split(',');
+                if (userValue?.Length != 2)
+                {
+                    Console.WriteLine("Invalid input! try again...2");
+                    continue;
+                }
+                if (!int.TryParse(userValue?[0].Trim(), out x))
+                {
+                    Console.WriteLine("Invalid input! try again...3");
+                    continue;
+                }
+                if (!int.TryParse(userValue?[1].Trim(), out y))
+                {
+                    Console.WriteLine("Invalid input! try again...4");
+                    continue;
+                }
+
+                break;
+            } while (true);
+
+            options.BoardHeight = y;
+            options.BoardWidth = x;
+
+            int userChoice;
+            var canBoatsTouch= PrintEnum<CanBoatsTouch>();
+            do
+            {
+                Console.WriteLine("Can boats touch?: ");
+                Console.Write(">");
+                userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+                
+                if (!int.TryParse(userInput.Trim(), out userChoice))
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (userChoice > canBoatsTouch.Count)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                break;
+            } while (true);
+
+            options.CanBoatsTouch = canBoatsTouch[userChoice];
+            
+            
+            var moveOnHit= PrintEnum<MoveOnHit>();
+            do
+            {
+                Console.WriteLine("What are Move on Hit rules?: ");
+                Console.Write(">");
+                userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+                
+                if (!int.TryParse(userInput.Trim(), out userChoice))
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (userChoice > moveOnHit.Count)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                break;
+            } while (true);
+
+            options.MoveOnHit = moveOnHit[userChoice];
+
+        }
+
         private static string BattleShip()
         {
-            // initiate a function that will define board dimensions
-            
+            var gameOptions = new GameOptions();
+
+            GameOptionSetup(gameOptions);
+
             // intiate a function that will define ship amounts
             
             // initiate some function to fill out 2 boards with ships
             
             
-            var game = new BattleShip(10, 4);
+            var game = new BattleShip(gameOptions);
             
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
@@ -153,6 +257,19 @@ namespace ica0016_2020f
         {
             Console.WriteLine("Not implemented yet!");
             return "";
+        }
+
+        private static List<T> PrintEnum<T>()
+        {
+            var enumArray = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+
+            for (int i = 0; i < enumArray.Count; i++)
+            {
+                Console.WriteLine($"{i}) {enumArray[i]}");
+            }
+
+
+            return enumArray;
         }
     }
 }

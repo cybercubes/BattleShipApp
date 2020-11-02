@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json;
+using GameBrain.Enums;
 using GameBrain.GameBrain;
 
 namespace GameBrain
@@ -11,14 +12,17 @@ namespace GameBrain
         private int _boardWidth;
         private int _boardHeight;
         private bool _nextMoveByA = true;
+        private MoveOnHit _moveOnHit;
 
-        public BattleShip(int width, int height)
+        public BattleShip(GameOptions options)
         {
-            _boardA = new CellState[height, width];
-            _boardB = new CellState[height, width];
+            _boardA = new CellState[options.BoardHeight, options.BoardWidth];
+            _boardB = new CellState[options.BoardHeight, options.BoardWidth];
 
-            _boardWidth = width;
-            _boardHeight = height;
+            _boardWidth = options.BoardWidth;
+            _boardHeight = options.BoardHeight;
+
+            _moveOnHit = options.MoveOnHit;
         }
 
         public (CellState[,], CellState[,]) GetBoards()
@@ -41,6 +45,19 @@ namespace GameBrain
                 board[y, x] = CellState.Miss;
                 _nextMoveByA = !_nextMoveByA;
                 return true;
+            }
+
+            if (board[y, x] == CellState.Ship)
+            {
+                board[y, x] = CellState.HitShip;
+                switch (_moveOnHit)
+                {
+                    case MoveOnHit.OtherPlayer:
+                        _nextMoveByA = !_nextMoveByA;
+                        return true;
+                    case MoveOnHit.SamePlayer:
+                        return true;
+                }
             }
 
             return false;

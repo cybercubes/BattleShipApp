@@ -1,4 +1,6 @@
-﻿namespace GameBrain
+﻿using GameBrain.Enums;
+
+namespace GameBrain
 {
     using System;
 
@@ -11,6 +13,8 @@
             public CellState[][] BoardB { get; set; } = null!;
             public int Width { get; set; }
             public int Height { get; set; }
+
+            public MoveOnHit MoveOnHit { get; set; }
         }
     }
 
