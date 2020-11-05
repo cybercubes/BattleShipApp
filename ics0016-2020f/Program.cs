@@ -4,7 +4,6 @@ using System.Linq;
 using DAL;
 using GameBrain;
 using GameBrain.Enums;
-using GameBrain.obj;
 using GameConsoleUi;
 using MenuSystem;
 using MenuSystem.Enums;

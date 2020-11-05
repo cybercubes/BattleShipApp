@@ -1,4 +1,4 @@
-﻿using GameBrain.obj;
+﻿using GameBrain;
 using Microsoft.EntityFrameworkCore;
 using GameOption = GameBrain.GameOption;
 

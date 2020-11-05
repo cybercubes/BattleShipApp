@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GameBrain.Enums;
-using GameBrain.obj;
 
 namespace GameBrain
 {
