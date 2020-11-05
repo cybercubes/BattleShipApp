@@ -7,6 +7,7 @@ using GameBrain.Enums;
 using GameConsoleUi;
 using MenuSystem;
 using MenuSystem.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace ica0016_2020f
 {
@@ -14,31 +15,28 @@ namespace ica0016_2020f
     {
         static void Main(string[] args)
         {
-            //using var db = new AppDbContext();
-            
             Console.WriteLine("============> BattleShip KILOSS <=================");
+            
+            using var db = new AppDbContext();
+            
+            db.Database.Migrate();
+            
+            Console.WriteLine("From db");
+            foreach (var dbGrade in db.GameOptions
+                .Include(g => g.BoardHeight)
+                .Include(g => g.BoardHeight)
+                .Where(g => g != null)
+            )
+            {
+                Console.WriteLine(dbGrade);
+            }
+
 
             var menu = new Menu(MenuLevels.Level0);
-            menu.AddMenuItem(new MenuItem("New PvP game", "1", BattleShip));
+            menu.AddMenuItem(new MenuItem("New PvP game", "1", () => BattleShip(db)));
 
             menu.RunMenu();
 
-        }
-
-        private static string SaveEntryIntoDb(BattleShip game, AppDbContext db)
-        {
-
-            db.GameOptions.Add(game.GetGameOptions());
-
-            var gameSaveData = new GameSaveData()
-            {
-                SerializedGameData = game.GetSerializedGameState(),
-            };
-
-            db.GameSaveDatas.Add(gameSaveData);
-            db.SaveChanges();
-
-            return "";
         }
 
         private static void GameOptionSetup(GameOption option)
@@ -141,7 +139,7 @@ namespace ica0016_2020f
 
         }
 
-        private static string BattleShip()
+        private static string BattleShip(AppDbContext db)
         {
             var gameOptions = new GameOption();
 
@@ -180,6 +178,12 @@ namespace ica0016_2020f
                 userChoice: "l",
                 () => LoadGameAction(game))
             );
+            
+            /*menu.AddMenuItem(new MenuItem(
+                $"Database",
+                userChoice: "d",
+                () => SaveEntryIntoDb(game, db))
+            );*/
 
             var userChoice = menu.RunMenu();
 
@@ -268,6 +272,22 @@ namespace ica0016_2020f
             // Console.WriteLine(serializedGame);
             System.IO.File.WriteAllText(fileName, serializedGame);
             
+            return "";
+        }
+        
+        private static string SaveEntryIntoDb(BattleShip game, AppDbContext db)
+        {
+
+            db.GameOptions.Add(game.GetGameOptions());
+
+            var gameSaveData = new GameSaveData()
+            {
+                SerializedGameData = game.GetSerializedGameState(),
+            };
+
+            db.GameSaveDatas.Add(gameSaveData);
+            db.SaveChanges();
+
             return "";
         }
 

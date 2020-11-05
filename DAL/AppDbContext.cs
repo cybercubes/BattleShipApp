@@ -7,8 +7,8 @@ namespace DAL
     public class AppDbContext : DbContext
     {
 
-        public DbSet<GameSaveData> GameSaveDatas { get; set; }
-        public DbSet<GameOption> GameOptions { get; set; }
+        public DbSet<GameSaveData> GameSaveDatas { get; set; } = null;
+        public DbSet<GameOption> GameOptions { get; set; } = null;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
