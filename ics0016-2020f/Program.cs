@@ -267,26 +267,33 @@ namespace ica0016_2020f
             {
                 //db.Database.EnsureDeleted();
                 //return "";
-
+                
+                /*
                 var gameSaveData = new GameSaveData()
                 {
                     SerializedGameData = game.GetSerializedGameState(),
                 };
 
-                db.GameSaveDatas.Add(gameSaveData);
-                db.GameOptions.Add(game.GetGameOptions());
-                
+                var gameOption = game.GetGameOptions();
+                gameOption.GameSaveData = gameSaveData;
+
+                db.GameOptions.Add(gameOption);*/
+
                 db.SaveChanges();
                 
                 Console.WriteLine("From Db");
 
-                var gameSaveDataList = db.GameSaveDatas
-                    .Include(gSData => gSData)
-                    .ToList();
-
-                foreach (var saveData in gameSaveDataList)
+                foreach (var gameOption in db.GameOptions
+                    .Include(g => g.GameSaveData)
+                    .OrderByDescending(g => g.GameSaveDataId)
+                )
                 {
-                    Console.WriteLine(saveData.TimeStamp);
+                    Console.WriteLine(gameOption.BoardHeight);
+                    Console.WriteLine(gameOption.BoardWidth);
+                    Console.WriteLine(gameOption.GameSaveData.TimeStamp);
+                    Console.WriteLine(gameOption.CanBoatsTouch);
+                    Console.WriteLine(gameOption.MoveOnHit);
+                    
                 }
 
             }

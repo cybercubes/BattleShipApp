@@ -11,7 +11,8 @@ namespace GameBrain
         
         public string SerializedGameData { get; set; }
         
-        public ICollection<GameOption> GameOptions{ get; set; }
+        //public ICollection<GameOption> GameOptions{ get; set; }
+        public GameOption GameOption{ get; set; }
         
         
     }
