@@ -14,6 +14,7 @@ namespace GameBrain
 
         public MoveOnHit MoveOnHit { get; set; } = MoveOnHit.SamePlayer;
 
-        public ICollection<GameSaveData> GameSaveData { get; set; }
+        public int GameSaveDataId { get; set; }
+        public GameSaveData GameSaveData { get; set; } = null!;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameBrain
 {
@@ -10,8 +11,7 @@ namespace GameBrain
         
         public string SerializedGameData { get; set; }
         
-        public int GameOptionsId { get; set; }
-        public GameOption GameOption { get; set; }
+        public ICollection<GameOption> GameOptions{ get; set; }
         
         
     }

@@ -23,9 +23,7 @@ namespace DAL
                         MultipleActiveResultSets=true
                         "
                 );
-            
-            
-            
+
             //.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
         }
     }

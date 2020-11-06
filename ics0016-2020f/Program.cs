@@ -17,19 +17,6 @@ namespace ica0016_2020f
         {
             Console.WriteLine("============> BattleShip KILOSS <=================");
 
-            /*db.Database.Migrate();
-            
-            Console.WriteLine("From db");
-            foreach (var dbGrade in db.GameOptions
-                .Include(g => g.BoardHeight)
-                .Include(g => g.BoardHeight)
-                .Where(g => g != null)
-            )
-            {
-                Console.WriteLine(dbGrade);
-            }*/
-
-
             var menu = new Menu(MenuLevels.Level0);
             menu.AddMenuItem(new MenuItem("New PvP game", "1", BattleShip));
 
@@ -278,10 +265,8 @@ namespace ica0016_2020f
 
             using (var db = new AppDbContext())
             {
-                db.Database.Migrate();
-
-
-                /*db.GameOptions.Add(game.GetGameOptions());
+                //db.Database.EnsureDeleted();
+                //return "";
 
                 var gameSaveData = new GameSaveData()
                 {
@@ -289,19 +274,21 @@ namespace ica0016_2020f
                 };
 
                 db.GameSaveDatas.Add(gameSaveData);
-                db.SaveChanges();*/
-
-                Console.WriteLine("From Db");
+                db.GameOptions.Add(game.GetGameOptions());
                 
-                var gameOptions = db.GameOptions
-                    .Include(gOption => gOption)
+                db.SaveChanges();
+                
+                Console.WriteLine("From Db");
+
+                var gameSaveDataList = db.GameSaveDatas
+                    .Include(gSData => gSData)
                     .ToList();
 
-                foreach (var item in gameOptions)
+                foreach (var saveData in gameSaveDataList)
                 {
-                    Console.WriteLine("dimensions: " + item.BoardHeight + ", " + item.BoardWidth);
-                    Console.WriteLine("game rules: " + item.CanBoatsTouch + ", " + item.MoveOnHit);
+                    Console.WriteLine(saveData.TimeStamp);
                 }
+
             }
 
             return "";
