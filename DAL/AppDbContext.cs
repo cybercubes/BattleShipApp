@@ -14,7 +14,19 @@ namespace DAL
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BattleShips;Trusted_Connection=True;");
+                .UseSqlServer(
+                    @"
+                        Server=barrel.itcollege.ee,1533;
+                        User Id=student;
+                        Password=Student.Bad.password.0;
+                        Database=kiloss_battleship;
+                        MultipleActiveResultSets=true
+                        "
+                );
+            
+            
+            
+            //.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
         }
     }
 }

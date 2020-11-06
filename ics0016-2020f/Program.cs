@@ -16,10 +16,8 @@ namespace ica0016_2020f
         static void Main(string[] args)
         {
             Console.WriteLine("============> BattleShip KILOSS <=================");
-            
-            using var db = new AppDbContext();
-            
-            db.Database.Migrate();
+
+            /*db.Database.Migrate();
             
             Console.WriteLine("From db");
             foreach (var dbGrade in db.GameOptions
@@ -29,11 +27,11 @@ namespace ica0016_2020f
             )
             {
                 Console.WriteLine(dbGrade);
-            }
+            }*/
 
 
             var menu = new Menu(MenuLevels.Level0);
-            menu.AddMenuItem(new MenuItem("New PvP game", "1", () => BattleShip(db)));
+            menu.AddMenuItem(new MenuItem("New PvP game", "1", BattleShip));
 
             menu.RunMenu();
 
@@ -139,7 +137,7 @@ namespace ica0016_2020f
 
         }
 
-        private static string BattleShip(AppDbContext db)
+        private static string BattleShip()
         {
             var gameOptions = new GameOption();
 
@@ -179,11 +177,11 @@ namespace ica0016_2020f
                 () => LoadGameAction(game))
             );
             
-            /*menu.AddMenuItem(new MenuItem(
+            menu.AddMenuItem(new MenuItem(
                 $"Database",
                 userChoice: "d",
-                () => SaveEntryIntoDb(game, db))
-            );*/
+                () => SaveEntryIntoDb(game))
+            );
 
             var userChoice = menu.RunMenu();
 
@@ -275,18 +273,36 @@ namespace ica0016_2020f
             return "";
         }
         
-        private static string SaveEntryIntoDb(BattleShip game, AppDbContext db)
+        private static string SaveEntryIntoDb(BattleShip game)
         {
 
-            db.GameOptions.Add(game.GetGameOptions());
-
-            var gameSaveData = new GameSaveData()
+            using (var db = new AppDbContext())
             {
-                SerializedGameData = game.GetSerializedGameState(),
-            };
+                db.Database.Migrate();
 
-            db.GameSaveDatas.Add(gameSaveData);
-            db.SaveChanges();
+
+                /*db.GameOptions.Add(game.GetGameOptions());
+
+                var gameSaveData = new GameSaveData()
+                {
+                    SerializedGameData = game.GetSerializedGameState(),
+                };
+
+                db.GameSaveDatas.Add(gameSaveData);
+                db.SaveChanges();*/
+
+                Console.WriteLine("From Db");
+                
+                var gameOptions = db.GameOptions
+                    .Include(gOption => gOption)
+                    .ToList();
+
+                foreach (var item in gameOptions)
+                {
+                    Console.WriteLine("dimensions: " + item.BoardHeight + ", " + item.BoardWidth);
+                    Console.WriteLine("game rules: " + item.CanBoatsTouch + ", " + item.MoveOnHit);
+                }
+            }
 
             return "";
         }
