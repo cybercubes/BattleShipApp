@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace GameBrain
+namespace Domain
 {
     public class GameSaveData
     {

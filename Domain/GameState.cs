@@ -1,7 +1,7 @@
-﻿namespace GameBrain
-{
-    using System;
+﻿using Domain.Enums;
 
+namespace Domain
+{
     namespace GameBrain
     {
         public class GameState

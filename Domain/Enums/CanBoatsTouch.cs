@@ -1,4 +1,4 @@
-﻿namespace GameBrain.Enums
+﻿namespace Domain.Enums
 {
     public enum CanBoatsTouch
     {

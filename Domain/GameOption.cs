@@ -1,26 +1,19 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Domain.Enums;
+﻿using Domain.Enums;
 
 namespace Domain
 {
     public class GameOption
     {
         public int GameOptionId { get; set; }
-        
-        [MaxLength(128)]
-        public string Name { get; set; }
+        public int BoardWidth { get; set; } = 5;
 
-        public int BoardWidth { get; set; }
-        public int BoardHeight { get; set; }
+        public int BoardHeight { get; set; } = 5;
 
-        // enums are actual int in the database
-        public EBoatsCanTouch EBoatsCanTouch { get; set; }
+        public CanBoatsTouch CanBoatsTouch { get; set; } = CanBoatsTouch.No;
 
-        public ENextMoveAfterHit ENextMoveAfterHit { get; set; }
+        public MoveOnHit MoveOnHit { get; set; } = MoveOnHit.SamePlayer;
 
-        public ICollection<GameOptionBoat> GameOptionBoats { get; set; }
-
-        public ICollection<Game> Games { get; set; }
+        public int GameSaveDataId { get; set; }
+        public GameSaveData GameSaveData { get; set; } = null!;
     }
 }

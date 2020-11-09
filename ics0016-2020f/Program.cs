@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using DAL;
+using Domain;
+using Domain.Enums;
 using GameBrain;
-using GameBrain.Enums;
 using GameConsoleUi;
 using MenuSystem;
 using MenuSystem.Enums;
@@ -63,10 +64,12 @@ namespace ica0016_2020f
             option.BoardWidth = x;
 
             int userChoice;
-            var canBoatsTouch= PrintEnum<CanBoatsTouch>();
+
+            var boatsTouches = GetEnumList<CanBoatsTouch>();
             do
             {
                 Console.WriteLine("Can boats touch?: ");
+                PrintEnum(boatsTouches);
                 Console.Write(">");
                 userInput = Console.ReadLine();
                 if (userInput == null)
@@ -81,7 +84,7 @@ namespace ica0016_2020f
                     continue;
                 }
 
-                if (userChoice > canBoatsTouch.Count)
+                if (userChoice > boatsTouches.Count + 1 || userChoice < 1)
                 {
                     Console.WriteLine("Invalid input! try again...");
                     continue;
@@ -90,13 +93,13 @@ namespace ica0016_2020f
                 break;
             } while (true);
 
-            option.CanBoatsTouch = canBoatsTouch[userChoice];
+            option.CanBoatsTouch = boatsTouches[userChoice - 1];
             
-            
-            var moveOnHit= PrintEnum<MoveOnHit>();
+            var moveOnHit = GetEnumList<MoveOnHit>();
             do
             {
                 Console.WriteLine("What are Move on Hit rules?: ");
+                PrintEnum(moveOnHit);
                 Console.Write(">");
                 userInput = Console.ReadLine();
                 if (userInput == null)
@@ -111,7 +114,7 @@ namespace ica0016_2020f
                     continue;
                 }
 
-                if (userChoice > moveOnHit.Count)
+                if (userChoice > moveOnHit.Count + 1 || userChoice < 1)
                 {
                     Console.WriteLine("Invalid input! try again...");
                     continue;
@@ -120,7 +123,7 @@ namespace ica0016_2020f
                 break;
             } while (true);
 
-            option.MoveOnHit = moveOnHit[userChoice];
+            option.MoveOnHit = moveOnHit[userChoice - 1];
 
         }
 
@@ -307,17 +310,17 @@ namespace ica0016_2020f
             return "";
         }
 
-        private static List<T> PrintEnum<T>()
+        private static void PrintEnum<T>(List<T> enumList)
         {
-            var enumArray = Enum.GetValues(typeof(T)).Cast<T>().ToList();
-
-            for (int i = 0; i < enumArray.Count; i++)
+            for (int i = 0; i < enumList.Count; i++)
             {
-                Console.WriteLine($"{i}) {enumArray[i]}");
+                Console.WriteLine($"{i + 1}) {enumList[i]}");
             }
+        }
 
-
-            return enumArray;
+        private static List<T> GetEnumList<T>()
+        {
+            return Enum.GetValues(typeof(T)).Cast<T>().ToList();
         }
     }
 }

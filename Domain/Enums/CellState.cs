@@ -1,4 +1,4 @@
-﻿namespace GameBrain
+﻿namespace Domain.Enums
 {
     public enum CellState
     {

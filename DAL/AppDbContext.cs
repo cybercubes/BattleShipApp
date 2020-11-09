@@ -1,6 +1,7 @@
-﻿using GameBrain;
+﻿using Domain;
+using GameBrain;
 using Microsoft.EntityFrameworkCore;
-using GameOption = GameBrain.GameOption;
+using GameOption = Domain.GameOption;
 
 namespace DAL
 {

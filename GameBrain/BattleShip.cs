@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text.Json;
-using GameBrain.Enums;
-using GameBrain.GameBrain;
+using Domain;
+using Domain.Enums;
+using Domain.GameBrain;
 
 namespace GameBrain
 {
@@ -124,6 +125,8 @@ namespace GameBrain
             }
             
         }
+        
+        
 
         public int GetBoardWidth()
         {
