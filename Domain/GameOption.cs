@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using System.Collections.Generic;
+using Domain.Enums;
 
 namespace Domain
 {
@@ -12,6 +13,8 @@ namespace Domain
         public CanBoatsTouch CanBoatsTouch { get; set; } = CanBoatsTouch.No;
 
         public MoveOnHit MoveOnHit { get; set; } = MoveOnHit.SamePlayer;
+
+        public ICollection<Boat> Boats { get; set; } = null!;
 
         public int GameSaveDataId { get; set; }
         public GameSaveData GameSaveData { get; set; } = null!;

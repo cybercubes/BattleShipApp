@@ -40,26 +40,32 @@ namespace GameBrain
 
         public bool MakeAMove(int x, int y)
         {
-            CellState[,] board = _nextMoveByA ? _boardA : _boardB;
+            var board = _nextMoveByA ? _boardA : _boardB;
             
-            if (board[y, x] == CellState.Empty)
+            switch (board[y, x])
             {
-                board[y, x] = CellState.Miss;
-                _nextMoveByA = !_nextMoveByA;
-                return true;
-            }
-
-            if (board[y, x] == CellState.Ship)
-            {
-                board[y, x] = CellState.HitShip;
-                switch (_gameOption.MoveOnHit)
-                {
-                    case MoveOnHit.OtherPlayer:
-                        _nextMoveByA = !_nextMoveByA;
-                        return true;
-                    case MoveOnHit.SamePlayer:
-                        return true;
-                }
+                case CellState.Empty:
+                    board[y, x] = CellState.Miss;
+                    _nextMoveByA = !_nextMoveByA;
+                    return true;
+                case CellState.Ship:
+                    board[y, x] = CellState.HitShip;
+                    switch (_gameOption.MoveOnHit)
+                    {
+                        case MoveOnHit.OtherPlayer:
+                            _nextMoveByA = !_nextMoveByA;
+                            return true;
+                        case MoveOnHit.SamePlayer:
+                            return true;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                case CellState.Miss:
+                    break;
+                case CellState.HitShip:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             return false;
@@ -125,8 +131,6 @@ namespace GameBrain
             }
             
         }
-        
-        
 
         public int GetBoardWidth()
         {

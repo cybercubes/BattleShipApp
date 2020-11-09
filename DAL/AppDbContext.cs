@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System;
+using Domain;
 using GameBrain;
 using Microsoft.EntityFrameworkCore;
 using GameOption = Domain.GameOption;
@@ -26,6 +27,19 @@ namespace DAL
                 );
 
             //.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
+        }
+        
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Boat>()
+                .HasIndex(u => u.Name)
+                .IsUnique();
+
+            builder.Entity<Boat>()
+                .HasIndex(u => u.Size)
+                .IsUnique();
+
+
         }
     }
 }

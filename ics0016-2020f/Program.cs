@@ -17,9 +17,31 @@ namespace ica0016_2020f
         static void Main(string[] args)
         {
             Console.WriteLine("============> BattleShip KILOSS <=================");
+            
+            var gameOptions = new GameOption();
 
             var menu = new Menu(MenuLevels.Level0);
-            menu.AddMenuItem(new MenuItem("New PvP game", "1", BattleShip));
+            menu.AddMenuItem(new MenuItem(
+                "New game",
+                "1",
+                () =>
+                {
+                    BattleShip(gameOptions);
+
+                    return "";
+                })
+            );
+
+            menu.AddMenuItem(new MenuItem(
+                "Setup Game Options",
+                "2",
+                () =>
+                {
+                    GameOptionSetup(gameOptions);
+                    
+                    return "";
+                })
+            );
 
             menu.RunMenu();
 
@@ -127,11 +149,15 @@ namespace ica0016_2020f
 
         }
 
-        private static string BattleShip()
+        private static string BattleShip(GameOption gameOptions)
         {
-            var gameOptions = new GameOption();
 
-            GameOptionSetup(gameOptions);
+            var initiateGameOptionSetup = AskYesNo("Do you want to setup rules from scratch? (if no, options saved in 'Setup Game Options' will be used)");
+
+            if (initiateGameOptionSetup)
+            {
+                GameOptionSetup(gameOptions);
+            }
 
             // intiate a function that will define ship amounts
             
@@ -321,6 +347,36 @@ namespace ica0016_2020f
         private static List<T> GetEnumList<T>()
         {
             return Enum.GetValues(typeof(T)).Cast<T>().ToList();
+        }
+        
+        private static bool AskYesNo(string question)
+        {
+            do
+            {
+                Console.WriteLine(question);
+                Console.Write(">");
+                var answer = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(answer))
+                {
+                    Console.WriteLine("Please answer with 'y,n' or 'yes,no'!");
+                    continue;
+                }
+
+                answer = answer.Trim().ToLower();
+                switch (answer)
+                {
+                    case "y":
+                    case "yes":
+                        return true;
+                    case "n":
+                    case "no":
+                        return false;
+                    default:
+                        Console.WriteLine("Please answer with 'y,n' or 'yes,no'!");
+                        break;
+                }
+            } while (true);
         }
     }
 }
