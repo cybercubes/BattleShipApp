@@ -12,6 +12,8 @@ namespace DAL
         public DbSet<GameSaveData> GameSaveDatas { get; set; } = null;
         public DbSet<GameOption> GameOptions { get; set; } = null;
 
+        public DbSet<Boat> Boats { get; set; } = null;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -29,7 +31,7 @@ namespace DAL
             //.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
         }
         
-        protected override void OnModelCreating(ModelBuilder builder)
+        /*protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Boat>()
                 .HasIndex(u => u.Name)
@@ -40,6 +42,6 @@ namespace DAL
                 .IsUnique();
 
 
-        }
+        }*/
     }
 }

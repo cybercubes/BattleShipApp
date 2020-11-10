@@ -42,21 +42,53 @@ namespace ica0016_2020f
                     return "";
                 })
             );
+            
+            menu.AddMenuItem(new MenuItem(
+                "Add new Boat",
+                "3",
+                () =>
+                {
+                    SetNewBoat(gameOptions);
+                    
+                    return "";
+                })
+            );
+            
+            menu.AddMenuItem(new MenuItem(
+                "Remove Boat",
+                "4",
+                () =>
+                {
+                    RemoveBoat(gameOptions);
+                    
+                    return "";
+                })
+            );
+            
+            menu.AddMenuItem(new MenuItem(
+                "Show Boats",
+                "5",
+                () =>
+                {
+                    PrintBoatList(gameOptions);
+                    
+                    return "";
+                })
+            );
 
             menu.RunMenu();
 
         }
 
-        private static void GameOptionSetup(GameOption option)
+        private static void SetBoardSize(GameOption option)
         {
             int x, y;
-            string userInput;
             do
             {
                 
                 Console.WriteLine("Enter board Size (X,Y): ");
                 Console.Write(">");
-                userInput = Console.ReadLine();
+                var userInput = Console.ReadLine();
                 if (userInput == null || userInput.Length < 3)
                 {
                     Console.WriteLine("Invalid input! try again...1");
@@ -84,7 +116,10 @@ namespace ica0016_2020f
 
             option.BoardHeight = y;
             option.BoardWidth = x;
+        }
 
+        private static void SetBoatsCanTouch(GameOption option)
+        {
             int userChoice;
 
             var boatsTouches = GetEnumList<CanBoatsTouch>();
@@ -93,7 +128,7 @@ namespace ica0016_2020f
                 Console.WriteLine("Can boats touch?: ");
                 PrintEnum(boatsTouches);
                 Console.Write(">");
-                userInput = Console.ReadLine();
+                var userInput = Console.ReadLine();
                 if (userInput == null)
                 {
                     Console.WriteLine("Invalid input! try again...");
@@ -116,6 +151,11 @@ namespace ica0016_2020f
             } while (true);
 
             option.CanBoatsTouch = boatsTouches[userChoice - 1];
+        }
+
+        private static void SetNextMoveOnHit(GameOption option)
+        {
+            int userChoice;
             
             var moveOnHit = GetEnumList<MoveOnHit>();
             do
@@ -123,7 +163,7 @@ namespace ica0016_2020f
                 Console.WriteLine("What are Move on Hit rules?: ");
                 PrintEnum(moveOnHit);
                 Console.Write(">");
-                userInput = Console.ReadLine();
+                var userInput = Console.ReadLine();
                 if (userInput == null)
                 {
                     Console.WriteLine("Invalid input! try again...");
@@ -146,6 +186,161 @@ namespace ica0016_2020f
             } while (true);
 
             option.MoveOnHit = moveOnHit[userChoice - 1];
+        }
+
+        private static void PrintBoatList(GameOption option)
+        {
+            if (option.Boats == null)
+            {
+                Console.WriteLine("The boat list is empty");
+                return;
+            }
+
+            foreach (var boat in option.Boats)
+            {
+                Console.WriteLine($"* {boat.ToString()}");
+            }
+        }
+
+        private static void SetNewBoat(GameOption option)
+        {
+            var boat = new Boat();
+
+            do
+            {
+                Console.WriteLine("Enter boat Name: ");
+                Console.Write(">");
+                var userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (option.Boats == null)
+                {
+                    boat.Name = userInput;
+                    break;
+                }
+
+                if (option.Boats.Any(x => x.Name == userInput))
+                {
+                    Console.WriteLine("There is already a boat with this name! try again...");
+                    continue;
+                }
+
+                boat.Name = userInput;
+                break;
+            } while (true);
+            
+            do
+            {
+                Console.WriteLine("Enter boat Size: ");
+                Console.Write(">");
+                var userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (!int.TryParse(userInput.Trim(), out var x))
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (x < 1)
+                {
+                    Console.WriteLine("Size value must be higher than 1! try again...");
+                    continue;
+                }
+
+                boat.Size = x;
+                break;
+            } while (true);
+
+            do
+            {
+                Console.WriteLine("Enter boat Amount: ");
+                Console.Write(">");
+                var userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (!int.TryParse(userInput.Trim(), out var x))
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (x < 0)
+                {
+                    Console.WriteLine("Size value must be higher than 0! try again...");
+                    continue;
+                }
+
+                boat.Amount = x;
+                break;
+            } while (true);
+
+            Console.WriteLine(boat.ToString());
+            var saveChanges = AskYesNo("Is this boat OK?");
+
+            if (!saveChanges)
+            {
+                return;
+            }
+
+            option.Boats ??= new List<Boat>();
+            
+            option.Boats.Add(boat);
+
+        }
+
+        private static void RemoveBoat(GameOption option)
+        {
+            if (option.Boats == null)
+            {
+                Console.WriteLine("List of boats is empty!");
+                return;
+            }
+
+            var userInput = "";
+            do
+            {
+                Console.WriteLine("Enter the Name of the boat you want to delete: ");
+                Console.Write(">");
+                userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Please don't submit an empty name! try again...");
+                    continue;
+                }
+
+                break;
+            } while (true);
+
+            foreach (var boat in option.Boats)
+            {
+                if (boat.Name != userInput) continue;
+                option.Boats.Remove(boat);
+                return;
+            }
+            
+            Console.WriteLine("Boat was not found...");
+        }
+
+        private static void GameOptionSetup(GameOption option)
+        {
+            SetBoardSize(option);
+            
+            SetBoatsCanTouch(option);
+
+            SetNextMoveOnHit(option);
 
         }
 
@@ -206,7 +401,7 @@ namespace ica0016_2020f
 
         }
 
-        static (int x, int y) GetMoveCoordinates(BattleShip game)
+        private static (int x, int y) GetMoveCoordinates(BattleShip game)
         {
             int x, y;
             do
@@ -250,7 +445,7 @@ namespace ica0016_2020f
             return (x, y);
         }
         
-        static string LoadGameAction(BattleShip game)
+        private static string LoadGameAction(BattleShip game)
         {
             var files = System.IO.Directory.EnumerateFiles(".", "*.json").ToList();
             for (int i = 0; i < files.Count; i++)
@@ -270,7 +465,7 @@ namespace ica0016_2020f
             return "";
         }
         
-        static string SaveGameAction(BattleShip game)
+        private static string SaveGameAction(BattleShip game)
         {
             // 2020-10-12
             var defaultName = "save_" + DateTime.Now.ToString("yyyy-MM-dd") + ".json";
@@ -327,12 +522,6 @@ namespace ica0016_2020f
 
             }
 
-            return "";
-        }
-
-        private static string DefaultMenuAction()
-        {
-            Console.WriteLine("Not implemented yet!");
             return "";
         }
 

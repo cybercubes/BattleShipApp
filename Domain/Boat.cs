@@ -18,6 +18,12 @@ namespace Domain
         
         public int GameOptionId { get; set; }
         public GameOption GameOption { get; set; } = null!;
+        
+        public override string ToString()
+        {
+            return $"{Name} - Size: {Size}, Amount To Place: {Amount}";
+        }
+
 
     }
 }
