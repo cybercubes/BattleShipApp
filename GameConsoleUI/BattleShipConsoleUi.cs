@@ -41,7 +41,7 @@ namespace GameConsoleUi
             }
         }
 
-        public static string CellString(CellState cellState, bool isAsTurn)
+        private static string CellString(CellState cellState, bool isAsTurn)
         {
             switch (cellState)
             {

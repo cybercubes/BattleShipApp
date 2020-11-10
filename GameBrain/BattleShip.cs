@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.Json;
 using Domain;
 using Domain.Enums;
@@ -13,7 +14,10 @@ namespace GameBrain
         private int _boardWidth;
         private int _boardHeight;
         private bool _nextMoveByA = true;
+        private bool _placeBoatsByA = true;
         private GameOption _gameOption;
+        private GameBoat[] _playerABoats;
+        private GameBoat[] _playerBBoats;
 
         public BattleShip(GameOption option)
         {
@@ -24,7 +28,79 @@ namespace GameBrain
             _boardHeight = option.BoardHeight;
 
             _gameOption = option;
+            
+            _playerABoats = BuildBoats();
+            _playerBBoats = BuildBoats();
 
+        }
+
+        public void PlaceBoat(int boatIndex, int x, int y)
+        {
+            var boats = _placeBoatsByA ? _playerABoats : _playerBBoats;
+            boats[boatIndex].CoordX = x;
+            boats[boatIndex].CoordY = y;
+        }
+
+        public void RotateBoat(int boatIndex)
+        {
+            var boats = _placeBoatsByA ? _playerABoats : _playerBBoats;
+
+            boats[boatIndex].Horizontal = !boats[boatIndex].Horizontal;
+        }
+
+        public void UpdateBoatsOnBoard()
+        {
+            var board = new CellState[_gameOption.BoardHeight, _gameOption.BoardWidth];
+            var boats = _placeBoatsByA ? _playerABoats : _playerBBoats;
+
+            foreach (var boat in boats)
+            {
+                if (boat.CoordX >= 0)
+                {
+                    UpdateBoat(boat, board);
+                }
+
+            }
+        }
+
+        private void UpdateBoat(GameBoat boat, CellState[,] board)
+        {
+            for (var i = 0; i < boat.Size; i++)
+            {
+                if (boat.Horizontal)
+                {
+                    board[boat.CoordX + i, boat.CoordY] = CellState.Ship;
+                }
+                else
+                {
+                    board[boat.CoordX, boat.CoordY + i] = CellState.Ship;
+                }
+            }
+        }
+
+        private GameBoat[] BuildBoats()
+        {
+            var boatArray = new GameBoat[CountBoatsFromOptions()];
+
+            var i = 0;
+            foreach (var boat in _gameOption.Boats)
+            {
+                for (var j = 0; j < boat.Amount; j++)
+                {
+                    boatArray[i] = new GameBoat
+                    {
+                        Size = boat.Size
+                    };
+                    i++;
+                }
+            }
+
+            return boatArray;
+        }
+
+        private int CountBoatsFromOptions()
+        {
+            return _gameOption.Boats.Sum(boat => boat.Amount);
         }
 
         public (CellState[,], CellState[,]) GetBoards()
@@ -34,6 +110,17 @@ namespace GameBrain
             
             var resB = new CellState[_boardHeight,_boardWidth];
             Array.Copy(_boardB, resB, _boardA.Length );
+
+            return (resA, resB);
+        }
+
+        public (GameBoat[], GameBoat[]) GetBoatArrays()
+        {
+            var resA = new GameBoat[CountBoatsFromOptions()];
+            Array.Copy(_playerABoats, resA, _playerABoats.Length );
+            
+            var resB = new GameBoat[CountBoatsFromOptions()];
+            Array.Copy(_playerBBoats, resB, _playerBBoats.Length );
 
             return (resA, resB);
         }
@@ -70,7 +157,6 @@ namespace GameBrain
 
             return false;
         }
-
 
         public string GetSerializedGameState()
         {

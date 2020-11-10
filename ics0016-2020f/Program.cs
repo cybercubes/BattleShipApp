@@ -352,9 +352,44 @@ namespace ica0016_2020f
 
         }
 
+        private static void ShipSetup(BattleShip game)
+        {
+            var boatArray = game.GetBoatArrays().Item1;
+            PrintAvailableBoats(boatArray);
+        }
+
+        private static void PrintAvailableBoats(GameBoat[] boats)
+        {
+            var i = 1;
+            foreach (var boat in boats)
+            {
+                if (boat == null) continue;
+                Console.WriteLine($"{i}) coords: {boat.CoordX}, {boat.CoordY} size: {boat.Size}, horizontal: {boat.Horizontal}");
+                i++;
+            }
+        }
+
+        private static void TempBoatOptionSolution(GameOption option)
+        {
+            option.Boats = new List<Boat>
+            {
+                new Boat()
+                {
+                    Name = "Fubuki", Amount = 2, Size = 2,
+                    
+                },
+                new Boat()
+                {
+                    Name = "Hamakaze", Amount = 3, Size = 1,
+                    
+                }
+            };
+        }
+
         private static string BattleShip(GameOption gameOptions)
         {
-
+            TempBoatOptionSolution(gameOptions);
+            
             if (gameOptions.Boats == null)
             {
                 Console.WriteLine("You can't start a game without having a list of ships to choose from, please add ships in the Option menu");
@@ -373,7 +408,9 @@ namespace ica0016_2020f
             // initiate some function to fill out 2 boards with ships
 
             var game = new BattleShip(gameOptions);
-            
+
+            ShipSetup(game);
+
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
             var menu = new Menu(MenuLevels.Level1);
