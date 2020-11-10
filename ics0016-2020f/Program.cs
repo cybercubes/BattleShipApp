@@ -21,6 +21,8 @@ namespace ica0016_2020f
             var gameOptions = new GameOption();
 
             var menu = new Menu(MenuLevels.Level0);
+            var optionMenu = new Menu(MenuLevels.Level1);
+            
             menu.AddMenuItem(new MenuItem(
                 "New game",
                 "1",
@@ -31,10 +33,16 @@ namespace ica0016_2020f
                     return "";
                 })
             );
-
+            
             menu.AddMenuItem(new MenuItem(
-                "Setup Game Options",
+                "Options",
                 "2",
+                optionMenu.RunMenu)
+            );
+
+            optionMenu.AddMenuItem(new MenuItem(
+                "Setup Game Options",
+                "1",
                 () =>
                 {
                     GameOptionSetup(gameOptions);
@@ -43,9 +51,9 @@ namespace ica0016_2020f
                 })
             );
             
-            menu.AddMenuItem(new MenuItem(
+            optionMenu.AddMenuItem(new MenuItem(
                 "Add new Boat",
-                "3",
+                "2",
                 () =>
                 {
                     SetNewBoat(gameOptions);
@@ -54,9 +62,9 @@ namespace ica0016_2020f
                 })
             );
             
-            menu.AddMenuItem(new MenuItem(
+            optionMenu.AddMenuItem(new MenuItem(
                 "Remove Boat",
-                "4",
+                "3",
                 () =>
                 {
                     RemoveBoat(gameOptions);
@@ -65,7 +73,7 @@ namespace ica0016_2020f
                 })
             );
             
-            menu.AddMenuItem(new MenuItem(
+            optionMenu.AddMenuItem(new MenuItem(
                 "Show Boats",
                 "5",
                 () =>
@@ -346,6 +354,12 @@ namespace ica0016_2020f
 
         private static string BattleShip(GameOption gameOptions)
         {
+
+            if (gameOptions.Boats == null)
+            {
+                Console.WriteLine("You can't start a game without having a list of ships to choose from, please add ships in the Option menu");
+                return "";
+            }
 
             var initiateGameOptionSetup = AskYesNo("Do you want to setup rules from scratch? (if no, options saved in 'Setup Game Options' will be used)");
 
