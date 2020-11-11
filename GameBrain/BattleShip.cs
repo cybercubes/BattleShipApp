@@ -34,6 +34,159 @@ namespace GameBrain
 
         }
 
+        public bool CheckIfBoatsOverlap(GameBoat[] boats)
+        {
+            var shipCellCount = 0;
+            var boardShipCount = 0;
+            var tempBoard = new CellState[_boardHeight, _boardWidth];
+
+            foreach (var boat in boats)
+            {
+                if (boat.CoordX == -1 && boat.CoordY == -1) continue;
+
+                shipCellCount += boat.Size;
+                
+                UpdateBoat(boat, tempBoard);
+            }
+            
+            for (var x = 0; x < _boardWidth; x++)
+            {
+                for (var y = 0; y < _boardHeight; y++)
+                {
+                    if (tempBoard[y, x] == CellState.Ship) boardShipCount++;
+                }
+            }
+
+            return shipCellCount != boardShipCount;
+        }
+
+        public bool CheckIfTouchViolated(GameBoat[] boats, CellState[,] board)
+        {
+            if (_gameOption.CanBoatsTouch == CanBoatsTouch.Yes) return false;
+
+            foreach (var boat in boats)
+            {
+                if (boat.CoordX == -1 && boat.CoordY == -1) continue;
+
+                if (_gameOption.CanBoatsTouch == CanBoatsTouch.No)
+                {
+                    if (CheckBoatCorners(boat, board)) return true;
+                }
+                if (CheckBoatEdges(boat, board)) return true;
+            }
+            
+            return false;
+        }
+
+        private bool CheckBoatCorners(GameBoat boat, CellState[,] board)
+        {
+            if (boat.Horizontal)
+            {
+                if (!(boat.CoordY - 1 < 0 || boat.CoordX - 1 < 0))
+                {
+                    if (board[boat.CoordY - 1, boat.CoordX - 1] == CellState.Ship) return true;
+                }
+                
+                if (!(boat.CoordY + 1 > _boardHeight - 1 || boat.CoordX - 1 < 0))
+                {
+                    if (board[boat.CoordY + 1, boat.CoordX - 1] == CellState.Ship) return true;
+                }
+                
+                if (!(boat.CoordY + 1 > _boardHeight - 1 || boat.CoordX + boat.Size > _boardWidth - 1))
+                {
+                    if (board[boat.CoordY + 1 , boat.CoordX + boat.Size] == CellState.Ship) return true;
+                }
+                
+                if (!(boat.CoordY - 1 < 0 || boat.CoordX + boat.Size > _boardWidth - 1))
+                {
+                    if (board[boat.CoordY - 1 , boat.CoordX + boat.Size] == CellState.Ship) return true;
+                }
+
+                return false;
+            }
+
+
+            if (!(boat.CoordY - 1 < 0 || boat.CoordX - 1 < 0))
+            {
+                if (board[boat.CoordY - 1, boat.CoordX - 1] == CellState.Ship) return true;
+            }
+
+            if (!(boat.CoordY - 1 < 0 || boat.CoordX + 1 > _boardWidth - 1))
+            {
+                if (board[boat.CoordY - 1, boat.CoordX + 1] == CellState.Ship) return true;
+            }
+
+            if (!(boat.CoordY + boat.Size > _boardHeight - 1 || boat.CoordX - 1 < 0))
+            {
+                if (board[boat.CoordY + boat.Size , boat.CoordX - 1] == CellState.Ship) return true;
+            }
+
+            if (!(boat.CoordY + boat.Size > _boardHeight - 1 || boat.CoordX + 1 > _boardWidth - 1))
+            {
+                if (board[boat.CoordY + boat.Size, boat.CoordX + 1] == CellState.Ship) return true;
+            }
+
+            return false;
+        }
+
+        private bool CheckBoatEdges(GameBoat boat, CellState[,] board)
+        {
+            if (boat.Horizontal)
+            {
+                if (!(boat.CoordX - 1 < 0))
+                {
+                    if (board[boat.CoordY, boat.CoordX - 1] == CellState.Ship) return true;   
+                }
+
+                for (var i = 0; i < boat.Size; i++)
+                {
+                    if (!(boat.CoordY - 1 < 0 || boat.CoordX + i >= _boardWidth))
+                    {
+                        if (board[boat.CoordY - 1, boat.CoordX + i] == CellState.Ship) return true;
+                    }
+                    
+                    if (!(boat.CoordY + 1 >= _boardHeight || boat.CoordX + i >= _boardWidth))
+                    {
+                        if (board[boat.CoordY + 1, boat.CoordX + i] == CellState.Ship) return true;
+                    }
+                }
+
+                if (!(boat.CoordX + boat.Size >= _boardWidth))
+                {
+                    if (board[boat.CoordY, boat.CoordX + boat.Size] == CellState.Ship) return true;
+                }
+
+                return false;
+            }
+
+            if (!(boat.CoordY - 1 < 0))
+            {
+                if (board[boat.CoordY - 1, boat.CoordX] == CellState.Ship) return true;
+            }
+
+            for (var i = 0; i < boat.Size; i++)
+            {
+                if (!(boat.CoordY + i >= _boardHeight || boat.CoordX - 1 < 0))
+                {
+                    if (board[boat.CoordY + i, boat.CoordX - 1] == CellState.Ship) return true;
+                }
+                
+                if (!(boat.CoordY + i >= _boardHeight || boat.CoordX + 1 >= _boardWidth))
+                {
+                    if (board[boat.CoordY + i, boat.CoordX + 1] == CellState.Ship) return true;
+                }
+            }
+            
+            if (!(boat.CoordY + boat.Size + 1 >= _boardHeight))
+            {
+                if (board[boat.CoordY + boat.Size + 1, boat.CoordX] == CellState.Ship) return true;
+            }
+            
+            
+            return false;
+        }
+
+
         public void PlaceBoat(int boatIndex, int x, int y)
         {
             var boats = _placeBoatsByA ? _playerABoats : _playerBBoats;
@@ -86,11 +239,11 @@ namespace GameBrain
             if (_placeBoatsByA)
             {
                 _boardA = board;
+                return;
             }
-            else
-            {
-                _boardB = board;
-            }
+            
+            _boardB = board;
+            
         }
 
         private void UpdateBoat(GameBoat boat, CellState[,] board)
@@ -100,11 +253,11 @@ namespace GameBrain
                 if (boat.Horizontal)
                 {
                     board[boat.CoordY, boat.CoordX + i] = CellState.Ship;
+                    continue;
                 }
-                else
-                {
-                    board[boat.CoordY + i, boat.CoordX] = CellState.Ship;
-                }
+                
+                board[boat.CoordY + i, boat.CoordX] = CellState.Ship;
+                
             }
         }
 

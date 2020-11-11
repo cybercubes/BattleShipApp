@@ -367,11 +367,25 @@ namespace ica0016_2020f
 
         private static void ShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
         {
+
             do
             {
                 var selectAnotherBoat = AskYesNo("Select Boat?");
+
                 if (!selectAnotherBoat)
                 {
+                    if (game.CheckIfBoatsOverlap(boatArray))
+                    {
+                        Console.WriteLine("Some boats overlap, please fix it!");
+                        continue;
+                    }
+                    var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
+                    if (game.CheckIfTouchViolated(boatArray, board))
+                    {
+                        Console.WriteLine("boats' corners are touching, please fix it!");
+                        continue;
+                    }
+
                     break;
                 }
                 
@@ -392,7 +406,7 @@ namespace ica0016_2020f
                 boats[shipIndex].CoordX = 0;
                 boats[shipIndex].CoordY = 0;
             }
-            //BattleShipConsoleUi.DrawBoard(game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2, game.GetTurn());
+            
             do
             {
                 Console.WriteLine("Select action: 'x' - stop, '< > \\/ /\\' - move boat, 'SpaceBar' - rotate, 'r' - remove boat");
@@ -506,10 +520,6 @@ namespace ica0016_2020f
             {
                 GameOptionSetup(gameOptions);
             }*/
-
-            // intiate a function that will define ship amounts
-            
-            // initiate some function to fill out 2 boards with ships
 
             var game = new BattleShip(gameOptions);
 
