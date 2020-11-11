@@ -355,7 +355,94 @@ namespace ica0016_2020f
         private static void ShipSetup(BattleShip game)
         {
             var boatArray = game.GetBoatArrays().Item1;
-            PrintAvailableBoats(boatArray);
+
+            do
+            {
+                var selectAnotherBoat = AskYesNo("Select Boat?");
+                if (!selectAnotherBoat)
+                {
+                    break;
+                }
+                
+                PrintAvailableBoats(boatArray);
+                var shipIndex = SelectShipIndex(boatArray.Length);
+
+                PlaceShip(game, shipIndex);
+
+            } while (true);
+            
+        }
+
+        private static void PlaceShip(BattleShip game, int shipIndex)
+        {
+            var boats = game.GetPlaceBoatsByA() ? game.GetBoatArrays().Item1 : game.GetBoatArrays().Item2;
+
+            if (boats[shipIndex].CoordX < 0)
+            {
+                boats[shipIndex].CoordX = 0;
+                boats[shipIndex].CoordY = 0;
+            }
+
+            do
+            {
+                Console.WriteLine("Select action: 'x' - stop, '↑↓→←' - move boat, 'SpaceBar' - rotate");
+                var input = Console.ReadKey();
+
+                if (input.Key == ConsoleKey.RightArrow)
+                {
+                    game.PlaceBoat(shipIndex, boats[shipIndex].CoordX + 1, boats[shipIndex].CoordY);
+                }
+                
+                if (input.Key == ConsoleKey.LeftArrow)
+                {
+                    game.PlaceBoat(shipIndex, boats[shipIndex].CoordX - 1, boats[shipIndex].CoordY);
+                }
+                
+                if (input.Key == ConsoleKey.UpArrow)
+                {
+                    game.PlaceBoat(shipIndex, boats[shipIndex].CoordX, boats[shipIndex].CoordY - 1);
+                }
+                
+                if (input.Key == ConsoleKey.DownArrow)
+                {
+                    game.PlaceBoat(shipIndex, boats[shipIndex].CoordX, boats[shipIndex].CoordY + 1);
+                    
+                }
+                
+                if (input.Key == ConsoleKey.Spacebar)
+                {
+                    game.RotateBoat(shipIndex);
+                    
+                }
+                
+                game.UpdateBoatsOnBoard();
+                var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
+                BattleShipConsoleUi.DrawBoard(board, game.GetTurn());
+
+                if (input.KeyChar == 'x')
+                {
+                    break;
+                }
+            } while (true);
+        }
+
+        private static int SelectShipIndex(int boatArrayLength)
+        {
+            do
+            {
+                Console.WriteLine("Please select a ship from the list");
+                Console.Write(">");
+                var userInput = Console.ReadLine();
+
+                if (!int.TryParse(userInput, out var x))
+                {
+                    Console.WriteLine("Value is not numeric! try again...");
+                    continue;
+                }
+
+                if (x - 1 >= 0 && x - 1 <= boatArrayLength - 1) return x - 1;
+                Console.WriteLine("Value is out of bounds of the boat array! try again...");
+            } while (true);
         }
 
         private static void PrintAvailableBoats(GameBoat[] boats)

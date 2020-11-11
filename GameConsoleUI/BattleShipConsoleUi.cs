@@ -25,14 +25,14 @@ namespace GameConsoleUi
             }
             Console.WriteLine();
 
-            for (int rowIndex = 0; rowIndex < height; rowIndex++)
+            for (var rowIndex = 0; rowIndex < height; rowIndex++)
             {
-                for (int colIndex = 0; colIndex < width; colIndex++)
+                for (var colIndex = 0; colIndex < width; colIndex++)
                 {
                     Console.Write($"| {CellString(board[rowIndex, colIndex], isAsTurn)} |");
                 }
                 Console.WriteLine();
-                for (int colIndex = 0; colIndex < width; colIndex++)
+                for (var colIndex = 0; colIndex < width; colIndex++)
                 {
                     Console.Write($"+---+");
                 }
@@ -48,11 +48,11 @@ namespace GameConsoleUi
                 case CellState.Empty:
                     return " ";
                 case CellState.Ship:
-                    return "[O]";
+                    return "8";
                 case CellState.Miss:
                     return "X";
                 case CellState.HitShip:
-                    return "[X]";
+                    return "H";
             }
 
             return "-";
