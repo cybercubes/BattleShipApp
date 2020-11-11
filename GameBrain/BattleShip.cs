@@ -38,6 +38,12 @@ namespace GameBrain
         {
             var boats = _placeBoatsByA ? _playerABoats : _playerBBoats;
             
+            if (x == -1 && y == -1)
+            {
+                boats[boatIndex].CoordX = x;
+                boats[boatIndex].CoordY = y;
+            }
+
             if (x < 0 || y < 0) return;
 
             if (x > _boardWidth - 1 || y > _boardHeight - 1) return;
@@ -238,6 +244,11 @@ namespace GameBrain
                 }
             }
             
+        }
+
+        public void ChangeWhoPlacesBoats()
+        {
+            _placeBoatsByA = !_placeBoatsByA;
         }
 
         public int GetBoardWidth()

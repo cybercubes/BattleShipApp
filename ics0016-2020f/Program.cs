@@ -356,6 +356,17 @@ namespace ica0016_2020f
         {
             var boatArray = game.GetBoatArrays().Item1;
 
+            Console.WriteLine("Ships for PlayerA");
+            ShipSetupForOneBoard(boatArray, game);
+            game.ChangeWhoPlacesBoats();
+            Console.WriteLine("Ships for PlayerB");
+            boatArray = game.GetBoatArrays().Item2;
+            ShipSetupForOneBoard(boatArray, game);
+
+        }
+
+        private static void ShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
+        {
             do
             {
                 var selectAnotherBoat = AskYesNo("Select Boat?");
@@ -370,7 +381,6 @@ namespace ica0016_2020f
                 PlaceShip(game, shipIndex);
 
             } while (true);
-            
         }
 
         private static void PlaceShip(BattleShip game, int shipIndex)
@@ -382,11 +392,12 @@ namespace ica0016_2020f
                 boats[shipIndex].CoordX = 0;
                 boats[shipIndex].CoordY = 0;
             }
-
+            //BattleShipConsoleUi.DrawBoard(game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2, game.GetTurn());
             do
             {
-                Console.WriteLine("Select action: 'x' - stop, '↑↓→←' - move boat, 'SpaceBar' - rotate");
+                Console.WriteLine("Select action: 'x' - stop, '< > \\/ /\\' - move boat, 'SpaceBar' - rotate, 'r' - remove boat");
                 var input = Console.ReadKey();
+                Console.WriteLine("");
 
                 if (input.Key == ConsoleKey.RightArrow)
                 {
@@ -408,16 +419,22 @@ namespace ica0016_2020f
                     game.PlaceBoat(shipIndex, boats[shipIndex].CoordX, boats[shipIndex].CoordY + 1);
                     
                 }
-                
+
                 if (input.Key == ConsoleKey.Spacebar)
                 {
                     game.RotateBoat(shipIndex);
                     
                 }
                 
+                if (input.KeyChar == 'r')
+                {
+                    game.PlaceBoat(shipIndex, -1, -1);
+                    break;
+                }
+                
                 game.UpdateBoatsOnBoard();
                 var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
-                BattleShipConsoleUi.DrawBoard(board, game.GetTurn());
+                BattleShipConsoleUi.DrawBoard(board, false);
 
                 if (input.KeyChar == 'x')
                 {
@@ -483,12 +500,12 @@ namespace ica0016_2020f
                 return "";
             }
 
-            var initiateGameOptionSetup = AskYesNo("Do you want to setup rules from scratch? (if no, options saved in 'Setup Game Options' will be used)");
+            /*var initiateGameOptionSetup = AskYesNo("Do you want to setup rules from scratch? (if no, options saved in 'Setup Game Options' will be used)");
 
             if (initiateGameOptionSetup)
             {
                 GameOptionSetup(gameOptions);
-            }
+            }*/
 
             // intiate a function that will define ship amounts
             
