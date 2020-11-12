@@ -15,6 +15,7 @@ namespace GameBrain
         private int _boardHeight;
         private bool _nextMoveByA = true;
         private bool _placeBoatsByA = true;
+        private string _winnerString = "";
         private GameOption _gameOption;
         private GameBoat[] _playerABoats;
         private GameBoat[] _playerBBoats;
@@ -32,6 +33,15 @@ namespace GameBrain
             _playerABoats = BuildBoats();
             _playerBBoats = BuildBoats();
 
+        }
+
+        public bool CheckIfBoatLimitIsViolated(GameBoat[] boats)
+        {
+            if (_gameOption.BoatLimit == -1) return false;
+
+            var counter = boats.Count(boat => boat.CoordX > -1 && boat.CoordY > -1);
+
+            return counter != _gameOption.BoatLimit;
         }
 
         public bool CheckIfBoatsOverlap(GameBoat[] boats)
@@ -281,7 +291,7 @@ namespace GameBrain
             return boatArray;
         }
 
-        private int CountBoatsFromOptions()
+        public int CountBoatsFromOptions()
         {
             return _gameOption.Boats.Sum(boat => boat.Amount);
         }
@@ -306,28 +316,32 @@ namespace GameBrain
             return (resA, resB);
         }
 
-        public bool MakeAMove(int x, int y)
+        public void MakeAMove(int x, int y)
         {
-            var board = _nextMoveByA ? _boardA : _boardB;
+            if (_winnerString != "") return;
             
+            var board = _nextMoveByA ? _boardA : _boardB;
+
             switch (board[y, x])
             {
                 case CellState.Empty:
                     board[y, x] = CellState.Miss;
                     _nextMoveByA = !_nextMoveByA;
-                    return true;
+                    break;
                 case CellState.Ship:
                     board[y, x] = CellState.HitShip;
                     switch (_gameOption.MoveOnHit)
                     {
                         case MoveOnHit.OtherPlayer:
                             _nextMoveByA = !_nextMoveByA;
-                            return true;
+                            break;
                         case MoveOnHit.SamePlayer:
-                            return true;
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
+
+                    break;
                 case CellState.Miss:
                     break;
                 case CellState.HitShip:
@@ -336,7 +350,42 @@ namespace GameBrain
                     throw new ArgumentOutOfRangeException();
             }
 
-            return false;
+            CheckForWinner(board);
+
+        }
+
+        private int CountSpecificCell(CellState[,] board, CellState cellState)
+        {
+            var counter = 0;
+            for (var x = 0; x < _boardWidth; x++)
+            {
+                for (var y = 0; y < _boardHeight; y++)
+                {
+                    if (board[x, y] == cellState) counter++;
+                }
+            }
+
+            return counter;
+        }
+
+        private void CheckForWinner(CellState[,] board)
+        {
+            if (CountSpecificCell(board, CellState.Ship) == 0)
+            {
+                _winnerString = board == _boardA ? "Winner is player A" : "Winner is player B";
+            }
+
+            /*for (var x = 0; x < _boardWidth; x++)
+            {
+                for (var y = 0; y < _boardHeight; y++)
+                {
+                    if (board[x, y] == CellState.Ship) return;
+                }
+            }
+
+            _winnerString = board == _boardA ? "Winner is player A" : "Winner is player B";
+            
+            */
         }
 
         public string GetSerializedGameState()
@@ -422,6 +471,11 @@ namespace GameBrain
         public bool GetPlaceBoatsByA()
         {
             return _placeBoatsByA;
+        }
+
+        public string GetWinnerString()
+        {
+            return _winnerString;
         }
 
         public GameOption GetGameOptions()

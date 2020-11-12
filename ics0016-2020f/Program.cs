@@ -196,6 +196,45 @@ namespace ica0016_2020f
             option.MoveOnHit = moveOnHit[userChoice - 1];
         }
 
+        private static void SetBoatLimit(GameOption option)
+        {
+            if (!AskYesNo("Should boat Limit be enforced?"))
+            {
+                option.BoatLimit = -1;
+                return;
+            }
+
+            int userChoice;
+            
+            do
+            {
+                Console.WriteLine("Enter Boat Limit: ");
+                Console.Write(">");
+                var userInput = Console.ReadLine();
+                if (userInput == null)
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+                
+                if (!int.TryParse(userInput.Trim(), out userChoice))
+                {
+                    Console.WriteLine("Invalid input! try again...");
+                    continue;
+                }
+
+                if (userChoice <= 0)
+                {
+                    Console.WriteLine("Limit can be equal to or less than zero");
+                    continue;
+                }
+
+                break;
+            } while (true);
+            
+            option.BoatLimit = userChoice;
+        }
+
         private static void PrintBoatList(GameOption option)
         {
             if (option.Boats == null)
@@ -206,7 +245,7 @@ namespace ica0016_2020f
 
             foreach (var boat in option.Boats)
             {
-                Console.WriteLine($"* {boat.ToString()}");
+                Console.WriteLine($"* {boat}");
             }
         }
 
@@ -345,6 +384,8 @@ namespace ica0016_2020f
         private static void GameOptionSetup(GameOption option)
         {
             SetBoardSize(option);
+
+            SetBoatLimit(option);
             
             SetBoatsCanTouch(option);
 
@@ -356,13 +397,72 @@ namespace ica0016_2020f
         {
             var boatArray = game.GetBoatArrays().Item1;
 
-            Console.WriteLine("Ships for PlayerA");
+            /*Console.WriteLine("Ships for PlayerB");
             ShipSetupForOneBoard(boatArray, game);
             game.ChangeWhoPlacesBoats();
-            Console.WriteLine("Ships for PlayerB");
+            Console.WriteLine("Ships for PlayerA");
             boatArray = game.GetBoatArrays().Item2;
-            ShipSetupForOneBoard(boatArray, game);
+            ShipSetupForOneBoard(boatArray, game);*/
+            
+            Console.WriteLine("Ships for PlayerB");
+            AutoShipSetupForOneBoard(boatArray, game);
+            game.ChangeWhoPlacesBoats();
+            Console.WriteLine("Ships for PlayerA");
+            boatArray = game.GetBoatArrays().Item2;
+            AutoShipSetupForOneBoard(boatArray, game);
 
+        }
+
+        private static void AutoShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
+        {
+            //TODO: Fix an occasional out of bounds exception
+            var r = new Random();
+            
+            do
+            {
+                for (var i = 0; i < boatArray.Length; i++)
+                {
+                    var boatIndex = r.Next(0, boatArray.Length);
+                    var boat = boatArray[boatIndex];
+
+                    var isHorizontal = (r.Next(0, 2) == 1);
+                    boat.Horizontal = isHorizontal;
+
+
+                    if (r.Next(0, 100) < 50)
+                    {
+                        var x = r.Next(0, game.GetBoardWidth());
+                        var y = r.Next(0, game.GetBoardHeight());
+
+                        if (isHorizontal && x + boat.Size - 1 < game.GetBoardWidth())
+                        {
+                            boat.CoordX = x;
+                            boat.CoordY = y;
+                        }
+
+                        if (!isHorizontal && y + boat.Size - 1 < game.GetBoardHeight())
+                        {
+                            boat.CoordX = x;
+                            boat.CoordY = y;
+                        }
+
+                    }
+                    else
+                    {
+                        boat.CoordX = -1;
+                        boat.CoordY = -1;
+                    }
+                    
+                    game.UpdateBoatsOnBoard();
+                }
+
+                var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
+                if (!(game.CheckIfBoatsOverlap(boatArray) ||
+                      game.CheckIfTouchViolated(boatArray, board) ||
+                      game.CheckIfBoatLimitIsViolated(boatArray))
+                ) break;
+
+            } while (true);
         }
 
         private static void ShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
@@ -374,6 +474,12 @@ namespace ica0016_2020f
 
                 if (!selectAnotherBoat)
                 {
+                    if (game.CheckIfBoatLimitIsViolated(boatArray))
+                    {
+                        Console.WriteLine("Boats don't match the boat limit rule, please fix it!");
+                        continue;
+                    }
+
                     if (game.CheckIfBoatsOverlap(boatArray))
                     {
                         Console.WriteLine("Some boats overlap, please fix it!");
@@ -382,7 +488,7 @@ namespace ica0016_2020f
                     var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
                     if (game.CheckIfTouchViolated(boatArray, board))
                     {
-                        Console.WriteLine("boats' corners are touching, please fix it!");
+                        Console.WriteLine("Boats' corners are touching, please fix it!");
                         continue;
                     }
 
@@ -392,6 +498,14 @@ namespace ica0016_2020f
                 PrintAvailableBoats(boatArray);
                 var shipIndex = SelectShipIndex(boatArray.Length);
 
+                if ((boatArray[shipIndex].Horizontal && boatArray[shipIndex].Size > game.GetBoardWidth())
+                    || (!boatArray[shipIndex].Horizontal && boatArray[shipIndex].Size > game.GetBoardHeight())
+                )
+                {
+                    Console.WriteLine("This boat is too big for this board, choose another boat...");
+                    continue;
+                }
+                
                 PlaceShip(game, shipIndex);
 
             } while (true);
@@ -496,11 +610,11 @@ namespace ica0016_2020f
                     Name = "Fubuki", Amount = 2, Size = 2,
                     
                 },
-                new Boat()
+                /*new Boat()
                 {
                     Name = "Hamakaze", Amount = 3, Size = 1,
                     
-                }
+                }*/
             };
         }
 
@@ -522,6 +636,12 @@ namespace ica0016_2020f
             }*/
 
             var game = new BattleShip(gameOptions);
+            
+            if (game.CountBoatsFromOptions() < gameOptions.BoatLimit)
+            {
+                Console.WriteLine("Not enough boats to meet the boat limit rule, please add moarrrrrr ;3");
+                return "";
+            }
 
             ShipSetup(game);
 
@@ -533,9 +653,18 @@ namespace ica0016_2020f
                 userChoice: "p",
                 () =>
                 {
+                    if (game.GetWinnerString() != "")
+                    {
+                        Console.WriteLine(game.GetWinnerString());
+                        return "";
+                    }
+
                     var (x, y) = GetMoveCoordinates(game);
                     game.MakeAMove(x, y);
+                    
+                    //can add a fancy BattleShipConsoleUi method that displays the winner string in a cool ascii art
                     BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
+                    Console.WriteLine(game.GetWinnerString());
                     return "";
                 })
             );
