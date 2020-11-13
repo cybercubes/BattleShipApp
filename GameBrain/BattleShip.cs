@@ -239,7 +239,7 @@ namespace GameBrain
 
             foreach (var boat in boats)
             {
-                if (boat.CoordX >= 0)
+                if (boat.CoordX >= 0 && boat.CoordY >= 0)
                 {
                     UpdateBoat(boat, board);
                 }

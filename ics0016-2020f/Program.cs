@@ -415,7 +415,6 @@ namespace ica0016_2020f
 
         private static void AutoShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
         {
-            //TODO: Fix an occasional out of bounds exception
             var r = new Random();
             
             do
@@ -425,22 +424,24 @@ namespace ica0016_2020f
                     var boatIndex = r.Next(0, boatArray.Length);
                     var boat = boatArray[boatIndex];
 
-                    var isHorizontal = (r.Next(0, 2) == 1);
-                    boat.Horizontal = isHorizontal;
-
+                    if (boat.CoordX == -1 && boat.CoordY == -1)
+                    {
+                        var isHorizontal = (r.Next(0, 2) == 1);
+                        boat.Horizontal = isHorizontal;
+                    }
 
                     if (r.Next(0, 100) < 50)
                     {
                         var x = r.Next(0, game.GetBoardWidth());
                         var y = r.Next(0, game.GetBoardHeight());
 
-                        if (isHorizontal && x + boat.Size - 1 < game.GetBoardWidth())
+                        if (boat.Horizontal && x + boat.Size - 1 < game.GetBoardWidth())
                         {
                             boat.CoordX = x;
                             boat.CoordY = y;
                         }
 
-                        if (!isHorizontal && y + boat.Size - 1 < game.GetBoardHeight())
+                        if (!boat.Horizontal && y + boat.Size - 1 < game.GetBoardHeight())
                         {
                             boat.CoordX = x;
                             boat.CoordY = y;
