@@ -443,12 +443,19 @@ namespace GameBrain
 
         public string GetSerializedGameState()
         {
+            var jsonOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            };
+
             var state = new GameState
             {
                 NextMoveByX = _nextMoveByA, 
                 Width = _boardA.GetLength(1), 
                 Height = _boardA.GetLength(0),
-                GameOption = _gameOption
+                //GameOption = _gameOption,
+                PlayerABoats = _playerABoats,
+                PlayerBBoats = _playerBBoats,
             };
             
             state.BoardA = new CellState[state.Width ][];
@@ -468,16 +475,12 @@ namespace GameBrain
                     state.BoardB[x][y] = _boardB[x, y];
                 }
             }
-
-            var jsonOptions = new JsonSerializerOptions()
-            {
-                 WriteIndented = true
-            };
+            
             return JsonSerializer.Serialize(state, jsonOptions);
             
         }
 
-        public void SetGameStateFromJsonString(string jsonString)
+        public void SetGameStateFromJsonString(string jsonString, GameOption option)
         {
             var state = JsonSerializer.Deserialize<GameState>(jsonString);
             
@@ -487,7 +490,9 @@ namespace GameBrain
             _boardB =  new CellState[state.Width, state.Height];
             _boardHeight = state.Height;
             _boardWidth = state.Width;
-            _gameOption = state.GameOption;
+            _gameOption = option;
+            _playerABoats = state.PlayerABoats;
+            _playerBBoats = state.PlayerBBoats;
             
             
             for (var x = 0; x < state.Width; x++)

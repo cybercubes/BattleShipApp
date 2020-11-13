@@ -19,6 +19,16 @@ namespace ica0016_2020f
             Console.WriteLine("============> BattleShip KILOSS <=================");
             
             var gameOptions = new GameOption();
+            
+            using var db = new AppDbContext();
+            foreach (var gameOption in db.GameOptions
+                .Include(g => g.Boats)
+                .Include(g => g.GameSaveData)
+            )
+            {
+                gameOptions = gameOption;
+            }
+
 
             var menu = new Menu(MenuLevels.Level0);
             var optionMenu = new Menu(MenuLevels.Level1);
@@ -88,6 +98,13 @@ namespace ica0016_2020f
 
         }
 
+        private static void UpdateOptionsInDb(GameOption option)
+        {
+            using var db = new AppDbContext();
+            db.GameOptions.Update(option);
+            db.SaveChanges();
+        }
+
         private static void SetBoardSize(GameOption option)
         {
             int x, y;
@@ -99,23 +116,23 @@ namespace ica0016_2020f
                 var userInput = Console.ReadLine();
                 if (userInput == null || userInput.Length < 3)
                 {
-                    Console.WriteLine("Invalid input! try again...1");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
                 var userValue = userInput?.Split(',');
                 if (userValue?.Length != 2)
                 {
-                    Console.WriteLine("Invalid input! try again...2");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
                 if (!int.TryParse(userValue?[0].Trim(), out x))
                 {
-                    Console.WriteLine("Invalid input! try again...3");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
                 if (!int.TryParse(userValue?[1].Trim(), out y))
                 {
-                    Console.WriteLine("Invalid input! try again...4");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
 
@@ -346,6 +363,8 @@ namespace ica0016_2020f
             
             option.Boats.Add(boat);
 
+            UpdateOptionsInDb(option);
+
         }
 
         private static void RemoveBoat(GameOption option)
@@ -374,7 +393,16 @@ namespace ica0016_2020f
             foreach (var boat in option.Boats)
             {
                 if (boat.Name != userInput) continue;
+
+                var confirm = AskYesNo($"are you sure you want to delete '{boat.Name}'?");
+                if (!confirm) return;
+
                 option.Boats.Remove(boat);
+
+                var db = new AppDbContext();
+                db.Boats.Remove(boat);
+                db.SaveChanges();
+
                 return;
             }
             
@@ -390,6 +418,8 @@ namespace ica0016_2020f
             SetBoatsCanTouch(option);
 
             SetNextMoveOnHit(option);
+
+            UpdateOptionsInDb(option);
 
         }
 
@@ -562,30 +592,23 @@ namespace ica0016_2020f
                     Name = "Fubuki", Amount = 2, Size = 2,
                     
                 },
-                /*new Boat()
+                new Boat()
                 {
                     Name = "Hamakaze", Amount = 3, Size = 1,
                     
-                }*/
+                }
             };
         }
 
         private static string BattleShip(GameOption gameOptions)
         {
-            TempBoatOptionSolution(gameOptions);
+            //TempBoatOptionSolution(gameOptions);
             
             if (gameOptions.Boats == null)
             {
                 Console.WriteLine("You can't start a game without having a list of ships to choose from, please add ships in the Option menu");
                 return "";
             }
-
-            /*var initiateGameOptionSetup = AskYesNo("Do you want to setup rules from scratch? (if no, options saved in 'Setup Game Options' will be used)");
-
-            if (initiateGameOptionSetup)
-            {
-                GameOptionSetup(gameOptions);
-            }*/
 
             var game = new BattleShip(gameOptions);
             
@@ -624,20 +647,14 @@ namespace ica0016_2020f
             menu.AddMenuItem(new MenuItem(
                 $"Save game",
                 userChoice: "s",
-                () => SaveGameAction(game))
+                () => SaveGameAction(game, gameOptions))
             );
 
 
             menu.AddMenuItem(new MenuItem(
                 $"Load game",
                 userChoice: "l",
-                () => LoadGameAction(game))
-            );
-            
-            menu.AddMenuItem(new MenuItem(
-                $"Database",
-                userChoice: "d",
-                () => SaveEntryIntoDb(game))
+                () => LoadGameAction(game, gameOptions))
             );
 
             var userChoice = menu.RunMenu();
@@ -691,9 +708,9 @@ namespace ica0016_2020f
             return (x, y);
         }
         
-        private static string LoadGameAction(BattleShip game)
+        private static string LoadGameAction(BattleShip game, GameOption gameOption)
         {
-            var files = System.IO.Directory.EnumerateFiles(".", "*.json").ToList();
+            /*var files = System.IO.Directory.EnumerateFiles(".", "*.json").ToList();
             for (int i = 0; i < files.Count; i++)
             {
                 Console.WriteLine($"{i} - {files[i]}");
@@ -705,69 +722,75 @@ namespace ica0016_2020f
             var jsonString = System.IO.File.ReadAllText(fileName);
 
             game.SetGameStateFromJsonString(jsonString);
+            */
+            
+            using var db = new AppDbContext();
+
+            var saveGames = db.GameSaveDatas.ToList();
+
+            if (saveGames.Count == 0)
+            {
+                Console.WriteLine("There are no saves available");
+                return "";
+            }
+
+            for (int i = 0; i < saveGames.Count; i++)
+            {
+                Console.WriteLine($"{i} - {saveGames[i]}");
+            }
+            
+            var saveNo = Console.ReadLine();
+            Console.Write(">");
+            if (!int.TryParse(saveNo, out var userChoice))
+            {
+                Console.WriteLine("Invalid input! try again...");
+                return "";
+            }
+
+            if (userChoice >= saveGames.Count)
+            {
+                Console.WriteLine("Invalid input! try again...");
+                return "";
+            }
+
+            var saveName = saveGames[userChoice];
+
+            var jsonString = saveName.SerializedGameData;
+            game.SetGameStateFromJsonString(jsonString, gameOption);
             
             BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
             
             return "";
         }
         
-        private static string SaveGameAction(BattleShip game)
+        private static string SaveGameAction(BattleShip game, GameOption gameOption)
         {
             // 2020-10-12
-            var defaultName = "save_" + DateTime.Now.ToString("yyyy-MM-dd") + ".json";
+            /*var defaultName = "save_" + DateTime.Now.ToString("yyyy-MM-dd") + ".json";
             Console.Write($"File name ({defaultName}):");
             var fileName = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 fileName = defaultName;
-            }
+            }*/
 
             var serializedGame = game.GetSerializedGameState();
             
-            // Console.WriteLine(serializedGame);
-            System.IO.File.WriteAllText(fileName, serializedGame);
+            using var db = new AppDbContext();
             
-            return "";
-        }
-        
-        private static string SaveEntryIntoDb(BattleShip game)
-        {
-
-            using (var db = new AppDbContext())
+            var gameSaveData = new GameSaveData()
             {
-                //db.Database.EnsureDeleted();
-                //return "";
-                
-                /*
-                var gameSaveData = new GameSaveData()
-                {
-                    SerializedGameData = game.GetSerializedGameState(),
-                };
+                SerializedGameData = serializedGame,
+            };
+            
+            gameOption.GameSaveData.Add(gameSaveData);
+            db.GameOptions.Update(gameOption);
+            db.SaveChanges();
 
-                var gameOption = game.GetGameOptions();
-                gameOption.GameSaveData = gameSaveData;
 
-                db.GameOptions.Add(gameOption);*/
-
-                db.SaveChanges();
-                
-                Console.WriteLine("From Db");
-
-                foreach (var gameOption in db.GameOptions
-                    .Include(g => g.GameSaveData)
-                    .OrderByDescending(g => g.GameSaveDataId)
-                )
-                {
-                    Console.WriteLine(gameOption.BoardHeight);
-                    Console.WriteLine(gameOption.BoardWidth);
-                    Console.WriteLine(gameOption.GameSaveData.TimeStamp);
-                    Console.WriteLine(gameOption.CanBoatsTouch);
-                    Console.WriteLine(gameOption.MoveOnHit);
-                    
-                }
-
-            }
-
+            //Console.WriteLine(serializedGame);
+            //System.IO.File.WriteAllText(fileName, serializedGame);
+            
             return "";
         }
 
