@@ -397,77 +397,24 @@ namespace ica0016_2020f
         {
             var boatArray = game.GetBoatArrays().Item1;
 
-            /*Console.WriteLine("Ships for PlayerB");
+            Console.WriteLine("Ships for PlayerB");
             ShipSetupForOneBoard(boatArray, game);
             game.ChangeWhoPlacesBoats();
             Console.WriteLine("Ships for PlayerA");
             boatArray = game.GetBoatArrays().Item2;
-            ShipSetupForOneBoard(boatArray, game);*/
-            
-            Console.WriteLine("Ships for PlayerB");
-            AutoShipSetupForOneBoard(boatArray, game);
-            game.ChangeWhoPlacesBoats();
-            Console.WriteLine("Ships for PlayerA");
-            boatArray = game.GetBoatArrays().Item2;
-            AutoShipSetupForOneBoard(boatArray, game);
+            ShipSetupForOneBoard(boatArray, game);
 
-        }
-
-        private static void AutoShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
-        {
-            var r = new Random();
-            
-            do
-            {
-                for (var i = 0; i < boatArray.Length; i++)
-                {
-                    var boatIndex = r.Next(0, boatArray.Length);
-                    var boat = boatArray[boatIndex];
-
-                    if (boat.CoordX == -1 && boat.CoordY == -1)
-                    {
-                        var isHorizontal = (r.Next(0, 2) == 1);
-                        boat.Horizontal = isHorizontal;
-                    }
-
-                    if (r.Next(0, 100) < 50)
-                    {
-                        var x = r.Next(0, game.GetBoardWidth());
-                        var y = r.Next(0, game.GetBoardHeight());
-
-                        if (boat.Horizontal && x + boat.Size - 1 < game.GetBoardWidth())
-                        {
-                            boat.CoordX = x;
-                            boat.CoordY = y;
-                        }
-
-                        if (!boat.Horizontal && y + boat.Size - 1 < game.GetBoardHeight())
-                        {
-                            boat.CoordX = x;
-                            boat.CoordY = y;
-                        }
-
-                    }
-                    else
-                    {
-                        boat.CoordX = -1;
-                        boat.CoordY = -1;
-                    }
-                    
-                    game.UpdateBoatsOnBoard();
-                }
-
-                var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
-                if (!(game.CheckIfBoatsOverlap(boatArray) ||
-                      game.CheckIfTouchViolated(boatArray, board) ||
-                      game.CheckIfBoatLimitIsViolated(boatArray))
-                ) break;
-
-            } while (true);
         }
 
         private static void ShipSetupForOneBoard(GameBoat[] boatArray, BattleShip game)
         {
+            var skip = AskYesNo("Do you want to place boats randomly?");
+
+            if (skip)
+            {
+                game.AutoShipSetupForOneBoard(boatArray);
+                return;
+            }
 
             do
             {
@@ -515,11 +462,15 @@ namespace ica0016_2020f
         private static void PlaceShip(BattleShip game, int shipIndex)
         {
             var boats = game.GetPlaceBoatsByA() ? game.GetBoatArrays().Item1 : game.GetBoatArrays().Item2;
+            CellState[,] board;
 
             if (boats[shipIndex].CoordX < 0)
             {
                 boats[shipIndex].CoordX = 0;
                 boats[shipIndex].CoordY = 0;
+                game.UpdateBoatsOnBoard();
+                board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
+                BattleShipConsoleUi.DrawBoard(board, false);
             }
             
             do
@@ -562,7 +513,7 @@ namespace ica0016_2020f
                 }
                 
                 game.UpdateBoatsOnBoard();
-                var board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
+                board = game.GetPlaceBoatsByA() ? game.GetBoards().Item1 : game.GetBoards().Item2;
                 BattleShipConsoleUi.DrawBoard(board, false);
 
                 if (input.KeyChar == 'x')

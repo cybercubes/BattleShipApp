@@ -290,6 +290,59 @@ namespace GameBrain
 
             return boatArray;
         }
+        
+        public void AutoShipSetupForOneBoard(GameBoat[] boatArray)
+        {
+            var r = new Random();
+            
+            do
+            {
+                for (var i = 0; i < boatArray.Length; i++)
+                {
+                    var boatIndex = r.Next(0, boatArray.Length);
+                    var boat = boatArray[boatIndex];
+
+                    if (boat.CoordX == -1 && boat.CoordY == -1)
+                    {
+                        var isHorizontal = (r.Next(0, 2) == 1);
+                        boat.Horizontal = isHorizontal;
+                    }
+
+                    if (r.Next(0, 100) < 50)
+                    {
+                        var x = r.Next(0, _boardWidth);
+                        var y = r.Next(0, _boardHeight);
+
+                        if (boat.Horizontal && x + boat.Size - 1 < _boardWidth)
+                        {
+                            boat.CoordX = x;
+                            boat.CoordY = y;
+                        }
+
+                        if (!boat.Horizontal && y + boat.Size - 1 < _boardHeight)
+                        {
+                            boat.CoordX = x;
+                            boat.CoordY = y;
+                        }
+
+                    }
+                    else
+                    {
+                        boat.CoordX = -1;
+                        boat.CoordY = -1;
+                    }
+                    
+                    UpdateBoatsOnBoard();
+                }
+
+                var board = _placeBoatsByA ? _boardA : _boardB;
+                if (!(CheckIfBoatsOverlap(boatArray) ||
+                      CheckIfTouchViolated(boatArray, board) ||
+                      CheckIfBoatLimitIsViolated(boatArray))
+                ) break;
+
+            } while (true);
+        }
 
         public int CountBoatsFromOptions()
         {
