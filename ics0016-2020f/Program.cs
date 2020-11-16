@@ -12,15 +12,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ica0016_2020f
 {
-    static class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("============> BattleShip KILOSS <=================");
             
             var gameOptions = new GameOption();
             
             using var db = new AppDbContext();
+
+            if (!db.GameOptions.Any())
+            {
+                MakeNewEntry();
+            }
+
             foreach (var gameOption in db.GameOptions
                 .Include(g => g.Boats)
                 .Include(g => g.GameSaveData)
@@ -98,6 +104,13 @@ namespace ica0016_2020f
 
         }
 
+        private static void MakeNewEntry()
+        {
+            using var db = new AppDbContext();
+            db.GameOptions.Add(new GameOption());
+            db.SaveChanges();
+        }
+
         private static void UpdateOptionsInDb(GameOption option)
         {
             using var db = new AppDbContext();
@@ -119,18 +132,18 @@ namespace ica0016_2020f
                     Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                var userValue = userInput?.Split(',');
-                if (userValue?.Length != 2)
+                var userValue = userInput.Split(',');
+                if (userValue.Length != 2)
                 {
                     Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                if (!int.TryParse(userValue?[0].Trim(), out x))
+                if (!int.TryParse(userValue[0].Trim(), out x))
                 {
                     Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                if (!int.TryParse(userValue?[1].Trim(), out y))
+                if (!int.TryParse(userValue[1].Trim(), out y))
                 {
                     Console.WriteLine("Invalid input! try again...");
                     continue;
@@ -254,7 +267,7 @@ namespace ica0016_2020f
 
         private static void PrintBoatList(GameOption option)
         {
-            if (option.Boats == null)
+            if (option.Boats.Count == 0)
             {
                 Console.WriteLine("The boat list is empty");
                 return;
@@ -281,7 +294,7 @@ namespace ica0016_2020f
                     continue;
                 }
 
-                if (option.Boats == null)
+                if (option.Boats.Count == 0)
                 {
                     boat.Name = userInput;
                     break;
@@ -359,8 +372,6 @@ namespace ica0016_2020f
                 return;
             }
 
-            option.Boats ??= new List<Boat>();
-            
             option.Boats.Add(boat);
 
             UpdateOptionsInDb(option);
@@ -369,13 +380,13 @@ namespace ica0016_2020f
 
         private static void RemoveBoat(GameOption option)
         {
-            if (option.Boats == null)
+            if (option.Boats.Count == 0)
             {
                 Console.WriteLine("List of boats is empty!");
                 return;
             }
 
-            var userInput = "";
+            string? userInput;
             do
             {
                 Console.WriteLine("Enter the Name of the boat you want to delete: ");
@@ -577,36 +588,16 @@ namespace ica0016_2020f
             var i = 1;
             foreach (var boat in boats)
             {
-                if (boat == null) continue;
                 Console.WriteLine($"{i}) coords: {boat.CoordX}, {boat.CoordY} size: {boat.Size}, horizontal: {boat.Horizontal}");
                 i++;
             }
         }
 
-        private static void TempBoatOptionSolution(GameOption option)
-        {
-            option.Boats = new List<Boat>
-            {
-                new Boat()
-                {
-                    Name = "Fubuki", Amount = 2, Size = 2,
-                    
-                },
-                new Boat()
-                {
-                    Name = "Hamakaze", Amount = 3, Size = 1,
-                    
-                }
-            };
-        }
-
         private static string BattleShip(GameOption gameOptions)
         {
-            //TempBoatOptionSolution(gameOptions);
-            
-            if (gameOptions.Boats == null)
+            if (gameOptions.Boats.Count == 0)
             {
-                Console.WriteLine("You can't start a game without having a list of ships to choose from, please add ships in the Option menu");
+                Console.WriteLine("You can't start a game without having a list of ships to choose from, please add ships in the Options menu");
                 return "";
             }
 
@@ -614,7 +605,7 @@ namespace ica0016_2020f
             
             if (game.CountBoatsFromOptions() < gameOptions.BoatLimit)
             {
-                Console.WriteLine("Not enough boats to meet the boat limit rule, please add moarrrrrr ;3");
+                Console.WriteLine("Not enough boats to meet the boat limit rule, please add more boats or change the boat limit");
                 return "";
             }
 
@@ -624,7 +615,7 @@ namespace ica0016_2020f
             
             var menu = new Menu(MenuLevels.Level1);
             menu.AddMenuItem(new MenuItem(
-                $"Make a move",
+                "Make a move",
                 userChoice: "p",
                 () =>
                 {
@@ -645,14 +636,14 @@ namespace ica0016_2020f
             );
             
             menu.AddMenuItem(new MenuItem(
-                $"Save game",
+                "Save game",
                 userChoice: "s",
                 () => SaveGameAction(game, gameOptions))
             );
 
 
             menu.AddMenuItem(new MenuItem(
-                $"Load game",
+                "Load game",
                 userChoice: "l",
                 () => LoadGameAction(game, gameOptions))
             );
@@ -674,23 +665,23 @@ namespace ica0016_2020f
                 var userInput = Console.ReadLine();
                 if (userInput == null || userInput.Length < 3)
                 {
-                    Console.WriteLine("Invalid input! try again...1");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                var userValue = userInput?.Split(',');
-                if (userValue?.Length != 2)
+                var userValue = userInput.Split(',');
+                if (userValue.Length != 2)
                 {
-                    Console.WriteLine("Invalid input! try again...2");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                if (!int.TryParse(userValue?[0].Trim(), out x))
+                if (!int.TryParse(userValue[0].Trim(), out x))
                 {
-                    Console.WriteLine("Invalid input! try again...3");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
-                if (!int.TryParse(userValue?[1].Trim(), out y))
+                if (!int.TryParse(userValue[1].Trim(), out y))
                 {
-                    Console.WriteLine("Invalid input! try again...4");
+                    Console.WriteLine("Invalid input! try again...");
                     continue;
                 }
                 if (x > game.GetBoardWidth() || y > game.GetBoardHeight() || x < 0 || y < 0)

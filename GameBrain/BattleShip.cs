@@ -37,9 +37,10 @@ namespace GameBrain
 
         public bool CheckIfBoatLimitIsViolated(GameBoat[] boats)
         {
-            if (_gameOption.BoatLimit == -1) return false;
-
             var counter = boats.Count(boat => boat.CoordX > -1 && boat.CoordY > -1);
+            if (counter == 0) return true;
+            
+            if (_gameOption.BoatLimit == -1) return false;
 
             return counter != _gameOption.BoatLimit;
         }
