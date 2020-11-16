@@ -8,11 +8,11 @@ namespace Domain
         
         public string TimeStamp { get; set; } = DateTime.Now.ToLongDateString();
 
-        public string SerializedGameData { get; set; } = null;
+        public string SerializedGameData { get; set; } = null!;
         
         //public ICollection<GameOption> GameOptions{ get; set; }
-        public GameOption GameOption{ get; set; }
-        
-        
+        public GameOption GameOption { get; set; } = null!;
+
+
     }
 }

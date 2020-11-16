@@ -6,8 +6,7 @@ namespace Domain
     {
         public int BoatId { get; set; }
 
-        [MaxLength(32)]
-        public string Name { get; set; }
+        [MaxLength(32)] public string Name { get; set; } = null!;
 
         [Range(1, int.MaxValue)]
         public int Size { get; set; }
