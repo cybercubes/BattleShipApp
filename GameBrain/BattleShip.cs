@@ -226,9 +226,11 @@ namespace GameBrain
 
             if (boats[boatIndex].Size == 1) return;
 
-            if (boats[boatIndex].CoordX + 1 > _boardWidth - 1 && !boats[boatIndex].Horizontal) return;
+            if (boats[boatIndex].CoordX + boats[boatIndex].Size - 1 > _boardWidth - 1 
+                && !boats[boatIndex].Horizontal) return;
             
-            if (boats[boatIndex].CoordY + 1 > _boardHeight - 1 && boats[boatIndex].Horizontal) return;
+            if (boats[boatIndex].CoordY + boats[boatIndex].Size - 1 > _boardHeight - 1 
+                && boats[boatIndex].Horizontal) return;
 
             boats[boatIndex].Horizontal = !boats[boatIndex].Horizontal;
         }
