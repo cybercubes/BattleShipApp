@@ -626,6 +626,7 @@ namespace ica0016_2020f
                     }
 
                     var (x, y) = GetMoveCoordinates(game);
+                    game.RecordMove(x, y);
                     game.MakeAMove(x, y);
                     
                     //can add a fancy BattleShipConsoleUi method that displays the winner string in a cool ascii art
@@ -633,6 +634,12 @@ namespace ica0016_2020f
                     Console.WriteLine(game.GetWinnerString());
                     return "";
                 })
+            );
+            
+            menu.AddMenuItem(new MenuItem(
+                "Replay from Journal",
+                userChoice: "j",
+                () => ReplayFromJournal(game))
             );
             
             menu.AddMenuItem(new MenuItem(
@@ -655,13 +662,64 @@ namespace ica0016_2020f
 
         }
 
+        private static string ReplayFromJournal(BattleShip game)
+        {
+            int choice;
+
+            do
+            {
+                var entryCounter = 0;
+                Console.WriteLine($"{entryCounter}) THE VERY BEGINNING.");
+                
+                
+                foreach (var entry in game.GetJournal())
+                {
+                    Console.WriteLine($"{entryCounter + 1}) Move: {entry.X}, {entry.Y}");
+                    entryCounter++;
+                }
+                
+                Console.WriteLine("Please enter the move number from which you want to continue... (x to cancel)");
+                Console.Write(">");
+                var userChoice = Console.ReadLine();
+                if (userChoice == null)
+                {
+                    Console.WriteLine("Invalid input! try again... or press x to cancel!");
+                    continue;
+                }
+
+                if (userChoice.ToLower() == "x") return "";
+
+                if (!int.TryParse(userChoice, out choice))
+                {
+                    Console.WriteLine("Invalid input! try again... or press x to cancel!");
+                    continue;
+                }
+
+                if (choice > game.GetJournalCount() || choice < 0) 
+                {
+                    Console.WriteLine("Chosen value is outside of journal's bounds... try again... or press x to cancel!");
+                    continue;
+                }
+
+                break;
+            } while (true);
+
+
+            game.ReplayJournalEntry(choice - 1);
+            BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
+            
+
+            return "";
+        }
+
         private static (int x, int y) GetMoveCoordinates(BattleShip game)
         {
             int x, y;
             do
             {
                 Console.WriteLine("Upper left corner is (1,1)!");
-                Console.Write($"Give X (1-{game.GetBoardWidth()}), Y (1-{game.GetBoardHeight()}):");
+                Console.WriteLine($"Give X (1-{game.GetBoardWidth()}), Y (1-{game.GetBoardHeight()}):");
+                Console.Write(">");
                 var userInput = Console.ReadLine();
                 if (userInput == null || userInput.Length < 3)
                 {
@@ -727,7 +785,7 @@ namespace ica0016_2020f
 
             for (int i = 0; i < saveGames.Count; i++)
             {
-                Console.WriteLine($"{i} - {saveGames[i]}");
+                Console.WriteLine($"{i} - {saveGames[i].TimeStamp}");
             }
             
             var saveNo = Console.ReadLine();

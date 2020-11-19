@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Domain;
 using Domain.Enums;
-using Domain.GameBrain;
 
 namespace GameBrain
 {
@@ -19,6 +19,7 @@ namespace GameBrain
         private GameOption _gameOption;
         private GameBoat[] _playerABoats;
         private GameBoat[] _playerBBoats;
+        private List<JournalEntry> _gameJournal;
 
         public BattleShip(GameOption option)
         {
@@ -32,7 +33,32 @@ namespace GameBrain
             
             _playerABoats = BuildBoats();
             _playerBBoats = BuildBoats();
+            
+            _gameJournal = new List<JournalEntry>();
+        }
 
+        public void ReplayJournalEntry(int moveNumber)
+        {
+            if (moveNumber < -1 && moveNumber >= _gameJournal.Count) return;
+
+            _nextMoveByA = true;
+            
+            UpdateBoatsOnBoard();
+            _placeBoatsByA = !_placeBoatsByA;
+            UpdateBoatsOnBoard();
+
+            if (moveNumber == -1)
+            {
+                _gameJournal.Clear();
+                return;
+            }
+
+            for (var i = 0; i <= moveNumber; i++)
+            {
+                MakeAMove(_gameJournal[i].X, _gameJournal[i].Y);
+            }
+            
+            _gameJournal.RemoveRange(moveNumber + 1, _gameJournal.Count - moveNumber - 1);
         }
 
         public bool CheckIfBoatLimitIsViolated(GameBoat[] boats)
@@ -431,6 +457,7 @@ namespace GameBrain
                 _winnerString = board == _boardA ? "Winner is player A" : "Winner is player B";
             }
 
+            //Less demanding solution 
             /*for (var x = 0; x < _boardWidth; x++)
             {
                 for (var y = 0; y < _boardHeight; y++)
@@ -451,6 +478,9 @@ namespace GameBrain
                 WriteIndented = true
             };
 
+            var test = JsonSerializer.Serialize(_gameJournal, jsonOptions);
+            Console.WriteLine(test);
+            
             var state = new GameState
             {
                 NextMoveByX = _nextMoveByA, 
@@ -459,6 +489,7 @@ namespace GameBrain
                 //GameOption = _gameOption,
                 PlayerABoats = _playerABoats,
                 PlayerBBoats = _playerBBoats,
+                GameJournal = _gameJournal.ToArray(),
             };
             
             state.BoardA = new CellState[state.Width ][];
@@ -496,6 +527,7 @@ namespace GameBrain
             _gameOption = option;
             _playerABoats = state.PlayerABoats;
             _playerBBoats = state.PlayerBBoats;
+            _gameJournal = state.GameJournal.ToList();
             
             
             for (var x = 0; x < state.Width; x++)
@@ -507,6 +539,11 @@ namespace GameBrain
                 }
             }
             
+        }
+
+        public void RecordMove(int x, int y)
+        {
+            _gameJournal.Add(new JournalEntry(x, y));
         }
 
         public void ChangeWhoPlacesBoats()
@@ -537,6 +574,16 @@ namespace GameBrain
         public string GetWinnerString()
         {
             return _winnerString;
+        }
+
+        public int GetJournalCount()
+        {
+            return _gameJournal.Count;
+        }
+
+        public List<JournalEntry> GetJournal()
+        {
+            return _gameJournal;
         }
 
         public GameOption GetGameOptions()

@@ -11,6 +11,7 @@ namespace GameConsoleUi
             DrawBoard(isAsTurn ? boards.Item1 : boards.Item2, true);
             Console.WriteLine("YOU\\/=====================/\\THEM");
             DrawBoard(isAsTurn ? boards.Item2 : boards.Item1, false);
+            Console.WriteLine($"Player {(isAsTurn ? "A" : "B")}'s Turn");
         }
         
         public static void DrawBoard(CellState[,] board, bool hideShips)
