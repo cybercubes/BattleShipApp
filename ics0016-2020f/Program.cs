@@ -683,7 +683,7 @@ namespace ica0016_2020f
                 var userChoice = Console.ReadLine();
                 if (userChoice == null)
                 {
-                    Console.WriteLine("Invalid input! try again... or press x to cancel!");
+                    Console.WriteLine("Invalid input! try again... or x to cancel!");
                     continue;
                 }
 
@@ -785,11 +785,26 @@ namespace ica0016_2020f
 
             for (int i = 0; i < saveGames.Count; i++)
             {
-                Console.WriteLine($"{i} - {saveGames[i].TimeStamp}");
+                Console.WriteLine($"{i} - {saveGames[i].TimeStamp} = {saveGames[i].SaveName}");
             }
             
-            var saveNo = Console.ReadLine();
+            Console.WriteLine("Please Select a save to load.. (x to cancel)");
             Console.Write(">");
+            var saveNo = Console.ReadLine();
+
+            if (saveNo == null)
+            {
+                Console.WriteLine("Invalid input! try again...");
+                return "";
+            }
+
+            if (saveNo.ToLower() == "x")
+            {
+                BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
+                
+                return "";
+            }
+
             if (!int.TryParse(saveNo, out var userChoice))
             {
                 Console.WriteLine("Invalid input! try again...");
@@ -826,10 +841,35 @@ namespace ica0016_2020f
             var serializedGame = game.GetSerializedGameState();
             
             using var db = new AppDbContext();
+
+            var saveName = "";
+
+            do
+            {
+                Console.WriteLine("Please Name Your Save... (x to cancel)");
+                Console.Write(">");
+                saveName = Console.ReadLine();
+
+                if (saveName != null)
+                {
+                    break;
+                }
+
+                Console.WriteLine("Please enter a valid name!");
+
+            } while (true);
+
+            if (saveName.ToLower() == "x")
+            {
+                BattleShipConsoleUi.DrawBothBoards(game.GetBoards(), game.GetTurn());
+                
+                return "";
+            }
             
             var gameSaveData = new GameSaveData()
             {
                 SerializedGameData = serializedGame,
+                SaveName = saveName,
             };
             
             gameOption.GameSaveData.Add(gameSaveData);

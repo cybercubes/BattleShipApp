@@ -478,9 +478,6 @@ namespace GameBrain
                 WriteIndented = true
             };
 
-            var test = JsonSerializer.Serialize(_gameJournal, jsonOptions);
-            Console.WriteLine(test);
-            
             var state = new GameState
             {
                 NextMoveByX = _nextMoveByA, 

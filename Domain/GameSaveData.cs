@@ -13,6 +13,8 @@ namespace Domain
         //public ICollection<GameOption> GameOptions{ get; set; }
         public GameOption GameOption { get; set; } = null!;
 
+        public string SaveName { get; set; } = null!;
+
 
     }
 }
