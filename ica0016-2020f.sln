@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ics0016-2020f", "ics0016-2020f\ics0016-2020f.csproj", "{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{7DE0BFE3-A6B0-44AE-9930-A367D8DC5807}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{37879FE1-1C07-4D66-95AE-2D19C20CBF91}"
 EndProject
