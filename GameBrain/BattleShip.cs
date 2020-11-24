@@ -443,7 +443,7 @@ namespace GameBrain
             {
                 for (var y = 0; y < _boardHeight; y++)
                 {
-                    if (board[x, y] == cellState) counter++;
+                    if (board[y, x] == cellState) counter++;
                 }
             }
 
