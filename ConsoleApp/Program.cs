@@ -20,7 +20,8 @@ namespace ica0016_2020f
             
             var gameOptions = new GameOption();
             
-            using var db = new AppDbContext();
+            DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+            using var db = new AppDbContext(options);
 
             if (!db.GameOptions.Any())
             {
@@ -106,14 +107,16 @@ namespace ica0016_2020f
 
         private static void MakeNewEntry()
         {
-            using var db = new AppDbContext();
+            DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+            using var db = new AppDbContext(options);
             db.GameOptions.Add(new GameOption());
             db.SaveChanges();
         }
 
         private static void UpdateOptionsInDb(GameOption option)
         {
-            using var db = new AppDbContext();
+            DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+            using var db = new AppDbContext(options);
             db.GameOptions.Update(option);
             db.SaveChanges();
         }
@@ -410,7 +413,8 @@ namespace ica0016_2020f
 
                 option.Boats.Remove(boat);
 
-                var db = new AppDbContext();
+                DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+                var db = new AppDbContext(options);
                 db.Boats.Remove(boat);
                 db.SaveChanges();
 
@@ -772,8 +776,8 @@ namespace ica0016_2020f
 
             game.SetGameStateFromJsonString(jsonString);
             */
-            
-            using var db = new AppDbContext();
+            DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+            using var db = new AppDbContext(options);
 
             var saveGames = db.GameSaveDatas.ToList();
 
@@ -840,7 +844,8 @@ namespace ica0016_2020f
 
             var serializedGame = game.GetSerializedGameState();
             
-            using var db = new AppDbContext();
+            DbContextOptions<AppDbContext> options = new DbContextOptions<AppDbContext>();
+            using var db = new AppDbContext(options);
 
             var saveName = "";
 

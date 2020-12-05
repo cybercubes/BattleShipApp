@@ -9,8 +9,10 @@ namespace DAL
 
         public DbSet<GameSaveData> GameSaveDatas { get; set; } = null!;
         public DbSet<GameOption> GameOptions { get; set; } = null!;
-
         public DbSet<Boat> Boats { get; set; } = null!;
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -25,8 +27,7 @@ namespace DAL
                         MultipleActiveResultSets=true
                         "
                 );
-
-            //.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyDatabase;Trusted_Connection=True;");
+            
         }
         
         /*protected override void OnModelCreating(ModelBuilder builder)

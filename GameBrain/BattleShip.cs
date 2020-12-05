@@ -516,7 +516,7 @@ namespace GameBrain
             var state = JsonSerializer.Deserialize<GameState>(jsonString);
             
             // restore actual state from deserialized state
-            _nextMoveByA = state.NextMoveByX;
+            _nextMoveByA = state!.NextMoveByX;
             _boardA =  new CellState[state.Width, state.Height];
             _boardB =  new CellState[state.Width, state.Height];
             _boardHeight = state.Height;

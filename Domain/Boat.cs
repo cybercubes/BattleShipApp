@@ -15,7 +15,7 @@ namespace Domain
         public int Amount { get; set; }
         
         public int GameOptionId { get; set; }
-        public GameOption GameOption { get; set; } = null!;
+        public GameOption? GameOption { get; set; }
         
         public override string ToString()
         {

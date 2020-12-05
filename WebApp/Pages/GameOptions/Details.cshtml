@@ -1,0 +1,55 @@
+@page
+@model WebApp.Pages_GameOptions.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>GameOption</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.BoardWidth)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.BoardWidth)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.BoardHeight)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.BoardHeight)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.BoatLimit)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.BoatLimit)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.CanBoatsTouch)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.CanBoatsTouch)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.MoveOnHit)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.MoveOnHit)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameOption.GameSaveDataId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameOption.GameSaveDataId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.GameOption.GameOptionId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
