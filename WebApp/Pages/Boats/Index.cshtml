@@ -41,7 +41,7 @@
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.GameOption.GameOptionId)
+                @Html.DisplayFor(modelItem => item.GameOption!.GameOptionId)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.BoatId">Edit</a> |

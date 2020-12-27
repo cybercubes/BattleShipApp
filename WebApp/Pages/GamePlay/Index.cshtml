@@ -1,0 +1,74 @@
+﻿@page
+@using Domain
+@using GameBrain
+@model WebApp.Pages.GamePlay.Index
+
+@{
+    //Layout = null;
+
+    var BattleShip = new BattleShip(Model.GameOption);
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div>
+    @{
+        var boatCount = 1;
+        @foreach (var boat in BattleShip.GetBoatArrays().Item1)
+        {
+            <a>
+                @boat.CoordX
+                @boat.CoordY
+                @boatCount;
+            </a>
+            boatCount++;
+        }
+    }
+</div>
+
+<div>
+    <a> Player A</a>
+    <table class="table table-bordered">
+        @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+        {
+            <tr>
+                @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
+                {
+                    <td>
+                        @BattleShip.GetBoards().Item1[y, x]
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+
+@{
+   /*<div class="col-4">
+      <table>
+          <tr>
+              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="up">⬆️</a></td>
+          </tr>
+          <tr>
+              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="left">⬅️</a>️</td>
+              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="rotate">🔄</a>️</td>
+              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="right">➡️</a>️</td>
+
+          </tr>
+          <tr>
+              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="down">⬇️</a>️</td>
+          </tr>
+          <tr>
+              <td colspan="3"><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="down-right">🆗️</a></td>
+          </tr>
+      </table>
+
+  </div>*/
+}
+</body>
+</html>
