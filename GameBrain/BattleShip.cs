@@ -573,6 +573,11 @@ namespace GameBrain
             return _winnerString;
         }
 
+        public void SetWinnerString(string winnerString)
+        {
+            _winnerString = winnerString;
+        }
+        
         public int GetJournalCount()
         {
             return _gameJournal.Count;

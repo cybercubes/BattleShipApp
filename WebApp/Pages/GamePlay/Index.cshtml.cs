@@ -131,6 +131,11 @@ namespace WebApp.Pages.GamePlay
 
             if (initGame)
             {
+                while (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")))
+                {
+                    GameOption.GameSaveData.Remove(GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use")));
+                }
+
                 var serializedGame = BattleShip.GetSerializedGameState();
                 
                 var gameSaveData = new GameSaveData()
@@ -148,24 +153,28 @@ namespace WebApp.Pages.GamePlay
 
             if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")))
             {
-                BattleShip.SetGameStateFromJsonString(GameOption.GameSaveData
-                        .Last(x => x.SaveName.Contains("Dt_use")).SerializedGameData, GameOption);
+                var saveData = GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use"));
+                
+                BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);
+                BattleShip.SetWinnerString(saveData.WinnerString);
                 CheckBoards();
             }
             
             if (xCoord != null && yCoord != null)
             {
                 BattleShip.MakeAMove(xCoord.Value, yCoord.Value);
+                Console.WriteLine(BattleShip.GetWinnerString());
 
                 if (BattleShip.GetWinnerString() != "")
                 {
-                    ModelState.AddModelError("", BattleShip.GetWinnerString());
+                    ModelState.AddModelError("Winner", BattleShip.GetWinnerString());
                 }
 
                 var gameSaveData = new GameSaveData()
                 {
                     SerializedGameData = BattleShip.GetSerializedGameState(),
                     SaveName = "Dt_use" + DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                    WinnerString = BattleShip.GetWinnerString()
                 };
 
                 GameOption.GameSaveData.Add(gameSaveData);

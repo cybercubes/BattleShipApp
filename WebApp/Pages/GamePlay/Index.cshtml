@@ -1,10 +1,31 @@
 ﻿@page
 @using GameBrain
+@using Domain.Enums
 @model WebApp.Pages.GamePlay.Index
 @{
                                   
     var BattleShip = Model.BattleShip?? new BattleShip(Model.GameOption);
     
+}
+
+@functions
+{
+    string GetCellContent(CellState cellState, bool playersTurn)
+    {
+        switch (cellState)
+        {
+            case CellState.Empty:
+                return " ";
+            case CellState.Miss:
+                return "x";
+            case CellState.Ship:
+                return playersTurn ? "8" : " ";
+            case CellState.HitShip:
+                return "H";
+            default:
+                throw new ArgumentException();
+        }
+    }
 }
 <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -81,10 +102,21 @@
                 <tr>
                     @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
                     {
-                        <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
-                            @BattleShip.GetBoards().Item1[y, x]
-                        </td>
+                        @if (BattleShip.GetTurn())
+                        {
+                            <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                                @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
+                            </td>
+                        }
                     }
+                    
+                    
                 </tr>
             }
         </table>
@@ -97,9 +129,18 @@
                 <tr>
                     @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
                     {
-                        <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
-                            @BattleShip.GetBoards().Item2[y, x]
-                        </td>
+                        @if (!BattleShip.GetTurn())
+                        {
+                            <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                                @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
+                            </td>
+                        }
                     }
                 </tr>
             }

@@ -15,6 +15,6 @@ namespace Domain
 
         public string SaveName { get; set; } = null!;
 
-
+        public string WinnerString { get; set; } = "";
     }
 }
