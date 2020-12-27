@@ -27,65 +27,86 @@ namespace WebApp.Pages.GamePlay
 
         public BattleShip? BattleShip { get; set; } = null;
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string? selectMode)
         {
             GameOption = await _context.GameOptions
                 .Include(g => g.Boats)
                 .Include(g => g.GameSaveData).FirstOrDefaultAsync() ?? new GameOption();
 
             BattleShip ??= new BattleShip(GameOption);
-            
-            foreach (var key in Request.Query)
-            {
-                var boatIndex = int.Parse(key.Key.Split("_").Last()) - 1;
-                var boatArray = BattleShip.GetPlaceBoatsByA() ?
-                    BattleShip.GetBoatArrays().Item1 : BattleShip.GetBoatArrays().Item2;
-                
-                
-                if (key.Key.Split("_").First() == "p2" && BattleShip.GetPlaceBoatsByA())
-                {
-                    BattleShip.ChangeWhoPlacesBoats();
-                }
 
-                if (key.Key.Contains("_horizontal_"))
+
+
+            if (Request.Query["PlaceNormal"].ToString() == "Place Ships")
+            {
+
+                for (var i = 0; i < BattleShip.GetBoatArrays().Item1.Count(); i++)
                 {
-                    if (key.Value.Count == 1)
+                    if (Request.Query.Count == 0) break;
+
+                    var boatIndex = i + 1;
+                    var x = int.Parse(Request.Query["p1_x_bIndex_" + boatIndex]);
+                    var y = int.Parse(Request.Query["p1_y_bIndex_" + boatIndex]);
+                    var horizontal = Request.Query["p1_horizontal_bIndex_" + boatIndex];
+
+                    if (horizontal.Count == 1)
                     {
-                        BattleShip.RotateBoat(boatIndex);
+                        BattleShip.RotateBoat(i);
                     }
+
+                    BattleShip.PlaceBoat(i, x, y);
+
                 }
 
-                if (key.Key.Contains("_x_"))
+                BattleShip.ChangeWhoPlacesBoats();
+
+                for (var i = 0; i < BattleShip.GetBoatArrays().Item2.Count(); i++)
                 {
-                    boatArray[boatIndex].CoordX = int.Parse(key.Value);
+                    if (Request.Query.Count == 0) break;
+
+                    var boatIndex = i + 1;
+                    var x = int.Parse(Request.Query["p2_x_bIndex_" + boatIndex]);
+                    var y = int.Parse(Request.Query["p2_y_bIndex_" + boatIndex]);
+                    var horizontal = Request.Query["p2_horizontal_bIndex_" + boatIndex];
+
+                    if (horizontal.Count == 1)
+                    {
+                        BattleShip.RotateBoat(i);
+                    }
+
+                    BattleShip.PlaceBoat(i, x, y);
+
                 }
-                
-                if (key.Key.Contains("_y_"))
+
+                BattleShip.UpdateBoatsOnBoard();
+                var boatPlacementViolation =
+                    RulesViolated(BattleShip.GetBoatArrays().Item2, BattleShip.GetBoards().Item2);
+                if (boatPlacementViolation)
                 {
-                    boatArray[boatIndex].CoordY = int.Parse(key.Value);
+                    Console.WriteLine("Rules Violated");
+                    ModelState.AddModelError("", "Your boat is placement bad! for player B");
+                }
+
+                BattleShip.ChangeWhoPlacesBoats();
+                BattleShip.UpdateBoatsOnBoard();
+
+                boatPlacementViolation = RulesViolated(BattleShip.GetBoatArrays().Item1, BattleShip.GetBoards().Item1);
+                if (boatPlacementViolation)
+                {
+                    Console.WriteLine("Rules Violated");
+                    ModelState.AddModelError("", "Your boat placement is bad!  player A");
                 }
             }
 
-            BattleShip.UpdateBoatsOnBoard();
-            var boatPlacementViolation = RulesViolated(BattleShip.GetBoatArrays().Item2, BattleShip.GetBoards().Item2);
-            if (boatPlacementViolation)
+            if (Request.Query["PlaceAuto"].ToString() == "Place Automatically")
             {
-                Console.WriteLine("Rules Violated");
-                ModelState.AddModelError("", "Your boat is bad!");
+                BattleShip.AutoShipSetupForOneBoard(BattleShip.GetBoatArrays().Item1);
+                BattleShip.ChangeWhoPlacesBoats();
+                BattleShip.AutoShipSetupForOneBoard(BattleShip.GetBoatArrays().Item2);
+                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             }
 
-            BattleShip.ChangeWhoPlacesBoats();
-            BattleShip.UpdateBoatsOnBoard();
-            
-            boatPlacementViolation = RulesViolated(BattleShip.GetBoatArrays().Item1, BattleShip.GetBoards().Item1);
-            if (boatPlacementViolation)
-            {
-                Console.WriteLine("Rules Violated");
-                ModelState.AddModelError("", "Your boat is bad!");
-            }
-            
-            
-
+            CheckBoards();
         }
 
         private bool RulesViolated(GameBoat[] boatArray, CellState[,] boardArray)
@@ -93,6 +114,42 @@ namespace WebApp.Pages.GamePlay
             return BattleShip!.CheckIfBoatsOverlap(boatArray) ||
                    BattleShip.CheckIfTouchViolated(boatArray, boardArray) ||
                    BattleShip.CheckIfBoatLimitIsViolated(boatArray);
+        }
+
+        private void CheckBoards()
+        {
+            for (var rowIndex = 0; rowIndex < BattleShip!.GetBoardHeight(); rowIndex++)
+            {
+                for (var colIndex = 0; colIndex < BattleShip.GetBoardWidth(); colIndex++)
+                {
+                    Console.Write($"| {BattleShip.GetBoards().Item1[rowIndex, colIndex]} |");
+                }
+                Console.WriteLine();
+                for (var colIndex = 0; colIndex < BattleShip.GetBoardWidth(); colIndex++)
+                {
+                    Console.Write($"+---+");
+                }
+                Console.WriteLine();
+                
+            }
+
+            Console.WriteLine("======================================================");
+            
+            for (var rowIndex = 0; rowIndex < BattleShip!.GetBoardHeight(); rowIndex++)
+            {
+                for (var colIndex = 0; colIndex < BattleShip.GetBoardWidth(); colIndex++)
+                {
+                    Console.Write($"| {BattleShip.GetBoards().Item2[rowIndex, colIndex]} |");
+                }
+                Console.WriteLine();
+                for (var colIndex = 0; colIndex < BattleShip.GetBoardWidth(); colIndex++)
+                {
+                    Console.Write($"+---+");
+                }
+                Console.WriteLine();
+                
+            }
+
         }
     }
 }
