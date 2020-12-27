@@ -1,74 +1,107 @@
 ﻿@page
-@using Domain
 @using GameBrain
 @model WebApp.Pages.GamePlay.Index
-
 @{
-    //Layout = null;
-
     var BattleShip = new BattleShip(Model.GameOption);
+    
 }
+<div asp-validation-summary="All" class="text-danger"></div>
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<div>
-    @{
-        var boatCount = 1;
-        @foreach (var boat in BattleShip.GetBoatArrays().Item1)
-        {
-            <a>
-                @boat.CoordX
-                @boat.CoordY
-                @boatCount;
-            </a>
-            boatCount++;
-        }
-    }
-</div>
-
-<div>
-    <a> Player A</a>
-    <table class="table table-bordered">
-        @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
-        {
-            <tr>
-                @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
-                {
-                    <td>
-                        @BattleShip.GetBoards().Item1[y, x]
-                    </td>
+<form method="get" name="placeBoats">
+    <div class="row">
+    
+   
+        <div class="col-6">
+            <table class="table table-bordered">
+                <h1> First Player</h1>
+                @{
+                    var boatCount = 1;
+                    @foreach (var boat in BattleShip.GetBoatArrays().Item1)
+                    {
+                        <tr>
+                            <td>
+                                @boatCount) 
+                                <input type="number" min="-1" max="@(BattleShip.GetBoardWidth() - 1)" value="-1" name="p1_x_bIndex_@boatCount" placeholder="xCoord">
+                                <input type="number" min="-1" max="@(BattleShip.GetBoardHeight() - 1)" value="-1" name="p1_y_bIndex_@boatCount" placeholder="yCoord">
+                                <br>
+                                <input type="hidden" value='0' name="p1_horizontal_bIndex_@boatCount" /> 
+                                <input type="checkbox" value='1' name="p1_horizontal_bIndex_@boatCount" /> placed Horizontally
+                            </td>
+                        </tr>
+                        boatCount++;
+                    }
+               
                 }
-            </tr>
-        }
-    </table>
+      
+            </table>
+        
+        
+
+        </div>
+        <div class="col-6">
+            <table class="table table-bordered">
+                <h1> Second Player</h1>
+                @{
+                    var boatCount2 = 1;
+                    @foreach (var boat in BattleShip.GetBoatArrays().Item2)
+                    {
+                        <tr>
+                            <td>
+                                @boatCount2)  
+                                <input type="number" min="-1" max="@(BattleShip.GetBoardWidth() - 1)" value="-1" name="p2_x_bIndex_@boatCount2" placeholder="xCoord">
+                                <input type="number" min="-1" max="@(BattleShip.GetBoardHeight() - 1)" value="-1" name="p2_y_bIndex_@boatCount2" placeholder="yCoord">
+                                <br>
+                                <input type="hidden" value='0' name="p2_horizontal_bIndex_@boatCount2" /> 
+                                <input type="checkbox" value='1' name="p2_horizontal_bIndex_@boatCount2" /> placed Horizontally
+                            </td>
+                        </tr>
+                        boatCount2++;
+                    }
+                                   
+                }
+                          
+            </table>
+        </div>
+    
+    </div>
+    
+    <input type="submit" value="Place Ships" class="btn btn-primary" />
+    <input type="submit" value="Place Automatically" class="btn btn-primary" />
+</form>
+
+<div class="row">
+    <div class="col-6">
+           <a> Player A</a>
+           <table class="table table-bordered">
+               @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+               {
+                   <tr>
+                       @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
+                       {
+                           <td>
+                               @BattleShip.GetBoards().Item1[y, x]
+                           </td>
+                       }
+                   </tr>
+               }
+           </table>
+    </div>
+    <div class="col-6">
+         <a> Player B</a>
+          <table class="table table-bordered">
+              @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+              {
+                  <tr>
+                      @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
+                      {
+                          <td>
+                              @BattleShip.GetBoards().Item2[y, x]
+                          </td>
+                      }
+                  </tr>
+              }
+          </table>
+        
+    </div>
+
 </div>
-
-@{
-   /*<div class="col-4">
-      <table>
-          <tr>
-              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="up">⬆️</a></td>
-          </tr>
-          <tr>
-              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="left">⬅️</a>️</td>
-              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="rotate">🔄</a>️</td>
-              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="right">➡️</a>️</td>
-
-          </tr>
-          <tr>
-              <td><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="down">⬇️</a>️</td>
-          </tr>
-          <tr>
-              <td colspan="3"><a asp-route-id="@Model.Game?.Id" asp-route-posx="@Model.PosX" asp-route-posy="@Model.PosY" asp-route-dir="down-right">🆗️</a></td>
-          </tr>
-      </table>
-
-  </div>*/
-}
-</body>
-</html>
