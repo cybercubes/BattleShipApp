@@ -2,7 +2,8 @@
 @using GameBrain
 @model WebApp.Pages.GamePlay.Index
 @{
-    var BattleShip = new BattleShip(Model.GameOption);
+                                  
+    var BattleShip = Model.BattleShip?? new BattleShip(Model.GameOption);
     
 }
 <div asp-validation-summary="All" class="text-danger"></div>
@@ -73,37 +74,45 @@
 
 <div class="row">
     <div class="col-6">
-           <a> Player A</a>
-           <table class="table table-bordered">
-               @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
-               {
-                   <tr>
-                       @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
-                       {
-                           <td>
-                               @BattleShip.GetBoards().Item1[y, x]
-                           </td>
-                       }
-                   </tr>
-               }
-           </table>
+        <a> Player A</a>
+        <table class="table table-bordered">
+            @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+            {
+                <tr>
+                    @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
+                    {
+                        <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                            @BattleShip.GetBoards().Item1[y, x]
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
     </div>
     <div class="col-6">
-         <a> Player B</a>
-          <table class="table table-bordered">
-              @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
-              {
-                  <tr>
-                      @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
-                      {
-                          <td>
-                              @BattleShip.GetBoards().Item2[y, x]
-                          </td>
-                      }
-                  </tr>
-              }
-          </table>
+        <a> Player B</a>
+        <table class="table table-bordered">
+            @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+            {
+                <tr>
+                    @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
+                    {
+                        <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                            @BattleShip.GetBoards().Item2[y, x]
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
         
     </div>
 
+</div>
+
+<div>
+    <Form method="get">
+        <input type="text" name="saveName" placeholder="enter saveName here">
+        
+        <input type="submit" name="SaveGame" value="Save This Game" class="btn btn-primary" />
+    </Form>
 </div>

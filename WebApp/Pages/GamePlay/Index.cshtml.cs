@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL;
@@ -27,13 +28,16 @@ namespace WebApp.Pages.GamePlay
 
         public BattleShip? BattleShip { get; set; } = null;
 
-        public async Task OnGetAsync(string? selectMode)
+        public async Task OnGetAsync(int? xCoord, int? yCoord)
         {
             GameOption = await _context.GameOptions
                 .Include(g => g.Boats)
-                .Include(g => g.GameSaveData).FirstOrDefaultAsync() ?? new GameOption();
+                .Include(g => g.GameSaveData)
+                .FirstOrDefaultAsync() ?? new GameOption();
+            
 
             BattleShip ??= new BattleShip(GameOption);
+            var initGame = false;
 
 
 
@@ -96,6 +100,8 @@ namespace WebApp.Pages.GamePlay
                     Console.WriteLine("Rules Violated");
                     ModelState.AddModelError("", "Your boat placement is bad!  player A");
                 }
+
+                initGame = true;
             }
 
             if (Request.Query["PlaceAuto"].ToString() == "Place Automatically")
@@ -103,10 +109,69 @@ namespace WebApp.Pages.GamePlay
                 BattleShip.AutoShipSetupForOneBoard(BattleShip.GetBoatArrays().Item1);
                 BattleShip.ChangeWhoPlacesBoats();
                 BattleShip.AutoShipSetupForOneBoard(BattleShip.GetBoatArrays().Item2);
-                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                
+                initGame = true;
             }
 
-            CheckBoards();
+            if (Request.Query["SaveGame"].ToString() == "Save This Game")
+            {
+                var serializedGame = BattleShip.GetSerializedGameState();
+                
+                var gameSaveData = new GameSaveData()
+                {
+                    SerializedGameData = serializedGame,
+                    SaveName = Request.Query["saveName"].ToString()
+                };
+
+                GameOption.GameSaveData.Add(gameSaveData);
+                _context.GameOptions.Update(GameOption);
+                await _context.SaveChangesAsync();
+            }
+            //CheckBoards();
+
+            if (initGame)
+            {
+                var serializedGame = BattleShip.GetSerializedGameState();
+                
+                var gameSaveData = new GameSaveData()
+                {
+                    SerializedGameData = serializedGame,
+                    SaveName = "Dt_use" + DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                };
+
+                GameOption.GameSaveData.Add(gameSaveData);
+                _context.GameOptions.Update(GameOption);
+                await _context.SaveChangesAsync();
+                
+                //TODO: delete DT_USE containing savenames
+            }
+
+            if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")))
+            {
+                BattleShip.SetGameStateFromJsonString(GameOption.GameSaveData.Last().SerializedGameData, GameOption);
+                CheckBoards();
+            }
+            
+            if (xCoord != null && yCoord != null)
+            {
+                BattleShip.MakeAMove(xCoord.Value, yCoord.Value);
+
+                if (BattleShip.GetWinnerString() != "")
+                {
+                    ModelState.AddModelError("", BattleShip.GetWinnerString());
+                }
+
+                var gameSaveData = new GameSaveData()
+                {
+                    SerializedGameData = BattleShip.GetSerializedGameState(),
+                    SaveName = "Dt_use" + DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                };
+
+                GameOption.GameSaveData.Add(gameSaveData);
+                _context.GameOptions.Update(GameOption);
+                await _context.SaveChangesAsync();
+            }
+
         }
 
         private bool RulesViolated(GameBoat[] boatArray, CellState[,] boardArray)
