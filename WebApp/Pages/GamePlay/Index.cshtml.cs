@@ -148,7 +148,8 @@ namespace WebApp.Pages.GamePlay
 
             if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")))
             {
-                BattleShip.SetGameStateFromJsonString(GameOption.GameSaveData.Last().SerializedGameData, GameOption);
+                BattleShip.SetGameStateFromJsonString(GameOption.GameSaveData
+                        .Last(x => x.SaveName.Contains("Dt_use")).SerializedGameData, GameOption);
                 CheckBoards();
             }
             
