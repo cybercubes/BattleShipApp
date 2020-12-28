@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using DAL;
 using Domain;
 using Domain.Enums;
 using GameBrain;
@@ -38,6 +37,7 @@ namespace WebApp.Pages.GamePlay
 
             BattleShip ??= new BattleShip(GameOption);
             var initGame = false;
+            var loadingGame = false;
 
 
 
@@ -113,9 +113,9 @@ namespace WebApp.Pages.GamePlay
                 initGame = true;
             }
 
-            if (Request.Query["SaveGame"].ToString() == "Save This Game")
+            if (Request.Query.ContainsKey("SaveGame"))
             {
-                var serializedGame = BattleShip.GetSerializedGameState();
+                var serializedGame = Request.Query["boardState"].ToString();//BattleShip.GetSerializedGameState();
                 
                 var gameSaveData = new GameSaveData()
                 {
@@ -127,7 +127,22 @@ namespace WebApp.Pages.GamePlay
                 _context.GameOptions.Update(GameOption);
                 await _context.SaveChangesAsync();
             }
-            //CheckBoards();
+
+            if (Request.Query.ContainsKey("loadId"))
+            {
+                var saveId = int.Parse(Request.Query["loadId"].ToString());
+                
+                loadingGame = true;
+
+                var saveData = GameOption.GameSaveData.First(x => x.GameSaveDataId == saveId);
+                
+                
+                BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);
+                BattleShip.SetWinnerString(saveData.WinnerString);
+
+                initGame = true;
+                CheckBoards();
+            }
 
             if (initGame)
             {
@@ -147,27 +162,25 @@ namespace WebApp.Pages.GamePlay
                 GameOption.GameSaveData.Add(gameSaveData);
                 _context.GameOptions.Update(GameOption);
                 await _context.SaveChangesAsync();
-                
-                //TODO: delete DT_USE containing savenames
             }
 
-            if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")))
+            if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")) && !loadingGame)
             {
                 var saveData = GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use"));
                 
                 BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);
                 BattleShip.SetWinnerString(saveData.WinnerString);
-                CheckBoards();
+                //CheckBoards();
             }
             
             if (xCoord != null && yCoord != null)
             {
                 BattleShip.MakeAMove(xCoord.Value, yCoord.Value);
-                Console.WriteLine(BattleShip.GetWinnerString());
 
                 if (BattleShip.GetWinnerString() != "")
                 {
                     ModelState.AddModelError("Winner", BattleShip.GetWinnerString());
+                    return;
                 }
 
                 var gameSaveData = new GameSaveData()

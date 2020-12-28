@@ -153,7 +153,7 @@
 <div>
     <Form method="get">
         <input type="text" name="saveName" placeholder="enter saveName here">
-        
+        <input type="hidden" name="boardState" value="@Model.BattleShip!.GetSerializedGameState()">
         <input type="submit" name="SaveGame" value="Save This Game" class="btn btn-primary" />
     </Form>
 </div>
