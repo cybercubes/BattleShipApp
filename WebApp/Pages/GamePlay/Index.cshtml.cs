@@ -34,11 +34,17 @@ namespace WebApp.Pages.GamePlay
             GameOption = await _context.GameOptions
                 .Include(g => g.Boats)
                 .Include(g => g.GameSaveData)
-                .FirstOrDefaultAsync() ?? new GameOption();
+                .FirstOrDefaultAsync();
             
 
             BattleShip ??= new BattleShip(GameOption);
             var initGame = false;
+
+            if (!GameOption.Boats.Any())
+            {
+                ModelState.AddModelError("", "The Boat pool is empty, add some boats!");
+                return;
+            }
 
             if (Request.Query.ContainsKey("PlaceNormal"))
             {
@@ -91,8 +97,8 @@ namespace WebApp.Pages.GamePlay
 
                 BattleShip.ChangeWhoPlacesBoats();
                 BattleShip.UpdateBoatsOnBoard();
-
-                boatPlacementViolation = RulesViolated(BattleShip.GetBoatArrays().Item1, BattleShip.GetBoards().Item1);
+                boatPlacementViolation = 
+                    RulesViolated(BattleShip.GetBoatArrays().Item1, BattleShip.GetBoards().Item1);
                 if (boatPlacementViolation)
                 {
                     ModelState.AddModelError("", "Your boat placement is bad!  player A");
@@ -173,7 +179,7 @@ namespace WebApp.Pages.GamePlay
                 await _context.SaveChangesAsync();
             }
             
-            if (GameOption.GameSaveData.Any(x=> x.SaveName.Contains("Dt_use")) && !Request.Query.ContainsKey("PlaceShip"))
+            if (GameOption.GameSaveData.Any(x=> x.SaveName.Contains("Dt_use")) && !Request.Query.ContainsKey("PlaceBoats"))
             {
                 var saveData = GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use"));
                 BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);

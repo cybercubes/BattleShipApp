@@ -502,8 +502,8 @@ namespace GameBrain
             {
                 for (var y = 0; y < state.Height; y++)
                 {
-                    state.BoardA[x][y] = _boardA[x, y];
-                    state.BoardB[x][y] = _boardB[x, y];
+                    state.BoardA[x][y] = _boardA[y, x];
+                    state.BoardB[x][y] = _boardB[y, x];
                 }
             }
             
@@ -517,8 +517,8 @@ namespace GameBrain
             
             // restore actual state from deserialized state
             _nextMoveByA = state!.NextMoveByX;
-            _boardA =  new CellState[state.Width, state.Height];
-            _boardB =  new CellState[state.Width, state.Height];
+            _boardA =  new CellState[state.Height, state.Width];
+            _boardB =  new CellState[state.Height, state.Width];
             _boardHeight = state.Height;
             _boardWidth = state.Width;
             _gameOption = option;
@@ -531,8 +531,8 @@ namespace GameBrain
             {
                 for (var y = 0; y < state.Height; y++)
                 {
-                    _boardA[x, y] = state.BoardA[x][y];
-                    _boardB[x, y] = state.BoardB[x][y];
+                    _boardA[y, x] = state.BoardA[x][y];
+                    _boardB[y, x] = state.BoardB[x][y];
                 }
             }
             
