@@ -27,6 +27,8 @@ namespace WebApp.Pages.GamePlay
 
         public BattleShip? BattleShip { get; set; } = null;
 
+        public bool BoatPlaceError = false;
+
         public async Task OnGetAsync(int? xCoord, int? yCoord)
         {
             GameOption = await _context.GameOptions
@@ -37,13 +39,9 @@ namespace WebApp.Pages.GamePlay
 
             BattleShip ??= new BattleShip(GameOption);
             var initGame = false;
-            var loadingGame = false;
-
-
 
             if (Request.Query["PlaceNormal"].ToString() == "Place Ships")
             {
-
                 for (var i = 0; i < BattleShip.GetBoatArrays().Item1.Count(); i++)
                 {
                     if (Request.Query.Count == 0) break;
@@ -87,8 +85,8 @@ namespace WebApp.Pages.GamePlay
                     RulesViolated(BattleShip.GetBoatArrays().Item2, BattleShip.GetBoards().Item2);
                 if (boatPlacementViolation)
                 {
-                    Console.WriteLine("Rules Violated");
                     ModelState.AddModelError("", "Your boat is placement bad! for player B");
+                    BoatPlaceError = true;
                 }
 
                 BattleShip.ChangeWhoPlacesBoats();
@@ -97,8 +95,8 @@ namespace WebApp.Pages.GamePlay
                 boatPlacementViolation = RulesViolated(BattleShip.GetBoatArrays().Item1, BattleShip.GetBoards().Item1);
                 if (boatPlacementViolation)
                 {
-                    Console.WriteLine("Rules Violated");
                     ModelState.AddModelError("", "Your boat placement is bad!  player A");
+                    BoatPlaceError = true;
                 }
 
                 initGame = true;
@@ -115,7 +113,7 @@ namespace WebApp.Pages.GamePlay
 
             if (Request.Query.ContainsKey("SaveGame"))
             {
-                var serializedGame = Request.Query["boardState"].ToString();//BattleShip.GetSerializedGameState();
+                var serializedGame = Request.Query["boardState"].ToString();
                 
                 var gameSaveData = new GameSaveData()
                 {
@@ -132,8 +130,6 @@ namespace WebApp.Pages.GamePlay
             {
                 var saveId = int.Parse(Request.Query["loadId"].ToString());
                 
-                loadingGame = true;
-
                 var saveData = GameOption.GameSaveData.First(x => x.GameSaveDataId == saveId);
                 
                 
@@ -142,6 +138,19 @@ namespace WebApp.Pages.GamePlay
 
                 initGame = true;
                 CheckBoards();
+            }
+            
+            if (Request.Query.ContainsKey("ContinueGame"))
+            {
+                try {
+                    var saveData = GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use"));
+                    BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);
+                    BattleShip.SetWinnerString(saveData.WinnerString);
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Can't Continue any games right now! Start a new one or load!");
+                }
             }
 
             if (initGame)
@@ -163,16 +172,15 @@ namespace WebApp.Pages.GamePlay
                 _context.GameOptions.Update(GameOption);
                 await _context.SaveChangesAsync();
             }
-
-            if (GameOption.GameSaveData.Any(x => x.SaveName.Contains("Dt_use")) && !loadingGame)
+            
+            if (GameOption.GameSaveData.Any(x=> x.SaveName.Contains("Dt_use")) && !Request.Query.ContainsKey("PlaceShip"))
             {
                 var saveData = GameOption.GameSaveData.Last(x => x.SaveName.Contains("Dt_use"));
-                
                 BattleShip.SetGameStateFromJsonString(saveData.SerializedGameData, GameOption);
                 BattleShip.SetWinnerString(saveData.WinnerString);
-                //CheckBoards();
+                
             }
-            
+
             if (xCoord != null && yCoord != null)
             {
                 BattleShip.MakeAMove(xCoord.Value, yCoord.Value);

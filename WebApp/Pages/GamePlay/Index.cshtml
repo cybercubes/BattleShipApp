@@ -26,13 +26,33 @@
                 throw new ArgumentException();
         }
     }
+
+    string GetShipSelectVisibility()
+    {
+        if (Request.Query.ContainsKey("PlaceBoats") || Model.BoatPlaceError)
+        {
+            return "visible";
+        }
+
+        return "hidden";
+
+    }
+    
+    string GetBoardVisibility()
+    {
+        if (!Request.Query.ContainsKey("PlaceBoats"))
+        {
+            return Model.BoatPlaceError ? "Hidden" : "visible";
+        }
+
+        return "hidden";
+
+    }
 }
 <div asp-validation-summary="All" class="text-danger"></div>
 
-<form method="get" name="placeBoats">
+<form method="get" name="placeBoats" style="visibility: @GetShipSelectVisibility()">
     <div class="row">
-    
-   
         <div class="col-6">
             <table class="table table-bordered">
                 <h1> First Player</h1>
@@ -91,69 +111,72 @@
     
     <input type="submit" name="PlaceNormal" value="Place Ships" class="btn btn-primary" />
     <input type="submit" name="PlaceAuto" value="Place Automatically" class="btn btn-primary" />
+    <input type="submit" name="ContinueGame" value="Continue" class="btn btn-primary" />
 </form>
 
-<div class="row">
-    <div class="col-6">
-        <a> Player B</a>
-        <table class="table table-bordered">
-            @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
-            {
-                <tr>
-                    @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
-                    {
-                        @if (BattleShip.GetTurn())
+<div style="visibility: @GetBoardVisibility()">
+    <div class="row">
+        <div class="col-6">
+            <a> Player B</a>
+            <table class="table table-bordered">
+                @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+                {
+                    <tr>
+                        @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
                         {
-                            <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
-                                @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
-                            </td>
+                            @if (BattleShip.GetTurn())
+                            {
+                                <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                                    @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
+                                </td>
+                            }
                         }
-                        else
+                        
+                        
+                    </tr>
+                }
+            </table>
+        </div>
+        <div class="col-6">
+            <a> Player A</a>
+            <table class="table table-bordered">
+                @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
+                {
+                    <tr>
+                        @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
                         {
-                            <td>
-                                @GetCellContent(BattleShip.GetBoards().Item1[y, x], !BattleShip.GetTurn())
-                            </td>
+                            @if (!BattleShip.GetTurn())
+                            {
+                                <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
+                                    @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
+                                </td>
+                            }
                         }
-                    }
-                    
-                    
-                </tr>
-            }
-        </table>
-    </div>
-    <div class="col-6">
-        <a> Player A</a>
-        <table class="table table-bordered">
-            @for (var y = 0; y < Model.GameOption.BoardHeight; y++)
-            {
-                <tr>
-                    @for (var x = 0; x < Model.GameOption.BoardWidth; x++)
-                    {
-                        @if (!BattleShip.GetTurn())
-                        {
-                            <td onclick="window.location.href = '?xCoord=@x&yCoord=@y'" style="cursor: pointer">
-                                @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
-                            </td>
-                        }
-                        else
-                        {
-                            <td>
-                                @GetCellContent(BattleShip.GetBoards().Item2[y, x], BattleShip.GetTurn())
-                            </td>
-                        }
-                    }
-                </tr>
-            }
-        </table>
-        
+                    </tr>
+                }
+            </table>
+            
+        </div>
+
     </div>
 
-</div>
-
-<div>
-    <Form method="get">
-        <input type="text" name="saveName" placeholder="enter saveName here">
-        <input type="hidden" name="boardState" value="@Model.BattleShip!.GetSerializedGameState()">
-        <input type="submit" name="SaveGame" value="Save This Game" class="btn btn-primary" />
-    </Form>
+    <div>
+        <Form method="get">
+            <input type="text" name="saveName" placeholder="Enter Save Name Here ">
+            <input type="hidden" name="boardState" value="@Model.BattleShip!.GetSerializedGameState()">
+            <input type="submit" name="SaveGame" value="Save This Game" class="btn btn-primary" />
+        </Form>
+    </div>
 </div>
