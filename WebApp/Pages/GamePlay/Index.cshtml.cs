@@ -40,7 +40,7 @@ namespace WebApp.Pages.GamePlay
             BattleShip ??= new BattleShip(GameOption);
             var initGame = false;
 
-            if (Request.Query["PlaceNormal"].ToString() == "Place Ships")
+            if (Request.Query.ContainsKey("PlaceNormal"))
             {
                 for (var i = 0; i < BattleShip.GetBoatArrays().Item1.Count(); i++)
                 {
@@ -102,7 +102,7 @@ namespace WebApp.Pages.GamePlay
                 initGame = true;
             }
 
-            if (Request.Query["PlaceAuto"].ToString() == "Place Automatically")
+            if (Request.Query.ContainsKey("PlaceAuto"))
             {
                 BattleShip.AutoShipSetupForOneBoard(BattleShip.GetBoatArrays().Item1);
                 BattleShip.ChangeWhoPlacesBoats();
@@ -183,13 +183,12 @@ namespace WebApp.Pages.GamePlay
 
             if (xCoord != null && yCoord != null)
             {
-                BattleShip.MakeAMove(xCoord.Value, yCoord.Value);
-
                 if (BattleShip.GetWinnerString() != "")
                 {
                     ModelState.AddModelError("Winner", BattleShip.GetWinnerString());
-                    return;
                 }
+                
+                BattleShip.MakeAMove(xCoord.Value, yCoord.Value);
 
                 var gameSaveData = new GameSaveData()
                 {
