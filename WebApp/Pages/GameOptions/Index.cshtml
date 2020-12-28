@@ -7,9 +7,6 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -57,8 +54,7 @@
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.GameOptionId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.GameOptionId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.GameOptionId">Delete</a>
+                <a asp-page="./Details" asp-route-id="@item.GameOptionId">Details</a>
             </td>
         </tr>
 }

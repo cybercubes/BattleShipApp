@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using DAL;
 using Domain;
 
 namespace WebApp.Pages_Boats
@@ -14,14 +10,12 @@ namespace WebApp.Pages_Boats
     {
         private readonly DAL.AppDbContext _context;
 
-        public DeleteModel(DAL.AppDbContext context, Boat boat)
+        public DeleteModel(DAL.AppDbContext context)
         {
             _context = context;
-            Boat = boat;
         }
 
-        [BindProperty]
-        public Boat Boat { get; set; }
+        [BindProperty] public Boat? Boat { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
